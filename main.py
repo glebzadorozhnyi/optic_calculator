@@ -11,7 +11,10 @@ pixel_size = pixel_size / 1000000
 focus = (pixel_size * threshold_pixel_count * distance) / target_size
 field = 2 * math.atan((pixel_horizontal * pixel_size) / (2 * focus))
 field = round(math.degrees(field), 1)
-st.markdown('Угловое поле [градус]')
-st.text(str(field))
-st.markdown('Фокусное расстояние [мм]')
-st.text(str(round(focus * 1000, 2)))
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown('Угловое поле')
+    st.subheader(str(field) + '°')
+with col2:
+    st.markdown('Фокусное расстояние')
+    st.subheader(str(round(focus * 1000, 2)) + ' мм')
