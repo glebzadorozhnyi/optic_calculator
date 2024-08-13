@@ -62,14 +62,14 @@ target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, 
 col_criteria, col_threshold = st.columns(2)
 
 with col_criteria:
-    criteria = st.selectbox('Выберите критерий', options=criterias, index=0, disabled=not matrix_args_enable, placeholder='Выберите матрицу', key='threshold_enable')
+    criteria = st.selectbox('Выберите критерий', options=criterias, index=0, placeholder='Выберите матрицу', key='threshold_enable')
 
 with col_threshold:
-    if criteria == 'Свой':
-        threshold_pixel_count_init = 12
+    if criteria == 'Свой критерий':
+        threshold_pixel_count_init = st.session_state.threshold_pixel_count
     else:
         threshold_pixel_count_init = int(criteria.split()[1])
-    threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1, max_value=10000, value=threshold_pixel_count_init, step=1, disabled=st.session_state.threshold_enable != 'Свой')
+    threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1, max_value=10000, value=threshold_pixel_count_init, step=1, disabled=st.session_state.threshold_enable != 'Свой критерий', key='threshold_pixel_count')
 
 distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1)
 pixel_size = pixel_size / 1000000
