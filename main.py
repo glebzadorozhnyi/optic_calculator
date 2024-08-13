@@ -25,7 +25,7 @@ st.image('shema.jpg',)
 
 st.subheader('Входные данные')
 
-col_matrix_type, col_select_tool, col_data = st.columns([1,1.2,1.9])
+col_matrix_type, col_select_tool, col_data = st.columns([1,1.9,1.2])
 
 matrix_types = list(data)
 with col_matrix_type:
@@ -35,38 +35,42 @@ with col_select_tool:
 
     if matrix_type == 'Своя':
         matrix_args_enable = False
+        pixel_horizontal = st.number_input('Количество пикселей в матрице по горизонтали [шт] (n)', min_value=1, max_value=10000, value=1920, step=1, disabled=False)
+        pixel_vertical = st.number_input('Количество пикселей в матрице по вертикали [шт] (n)', min_value=1, max_value=10000, value=1080, step=1, disabled=matrix_args_enable)
     else:
         matrix_args_enable = True
 
-    matrix = st.selectbox('Выберите матрицу', options=matrixes, index=0,
-                disabled=not matrix_args_enable, placeholder='Выберите матрицу')
-    resolution = st.selectbox('Выберите разрешение', options=data[matrix_type][matrix], index=0,
-                 disabled=not matrix_args_enable or len(data[matrix_type][matrix]) == 1, placeholder='Выберите разрешение')
+        matrix = st.selectbox('Выберите матрицу', options=matrixes, index=0,
+                    disabled=not matrix_args_enable, placeholder='Выберите матрицу')
+        resolution = st.selectbox('Выберите разрешение', options=data[matrix_type][matrix], index=0,
+                     disabled=not matrix_args_enable or len(data[matrix_type][matrix]) == 1, placeholder='Выберите разрешение')
 
 
 
 with col_data:
+
     if matrix_args_enable:
         pixel_horizontal = int(resolution.split()[0])
+        pixel_vertical = int(resolution.split()[2])
         pixel_size = float(list(data[matrix_type][matrix][resolution])[0])
-
+        st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=pixel_size, step=0.01, disabled=True, key='pixel_size')
     else:
-        pixel_horizontal = 1920
-        pixel_size = 3.45
-    st.number_input('Количество пикселей в матрице по горизонтали [шт] (n)', min_value=1, max_value=10000, value=pixel_horizontal, step=1, disabled=matrix_args_enable)
-    st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=pixel_size, step=0.01, disabled=matrix_args_enable)
+        pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=3.45, step=0.01, disabled=False, key='pixel_size2')
+
 target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=0.2, step=0.01)
 threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1, max_value=10000, value=12, step=1)
 distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1)
 pixel_size = pixel_size / 1000000
 focus = (pixel_size * threshold_pixel_count * distance) / target_size
-field = 2 * math.atan((pixel_horizontal * pixel_size) / (2 * focus))
-field = round(math.degrees(field), 1)
+field_h = 2 * math.atan((pixel_horizontal * pixel_size) / (2 * focus))
+field_v = 2 * math.atan((pixel_vertical * pixel_size) / (2 * focus))
+field_h = round(math.degrees(field_h), 1)
+field_v = round(math.degrees(field_v), 1)
 st.subheader('Расчитанные данные')
 col_focus, col_field = st.columns(2)
 with col_focus:
     st.markdown('Фокусное расстояние (f)')
-    st.subheader(str(round(focus * 1000, 2)) + ' мм')
+    st.subheader(str(round(focus * 1000, 1)) + ' мм')
 with col_field:
-    st.markdown('Угловое поле по горизонтали(w)')
-    st.subheader(str(field) + '°')
+    st.markdown('Угловое поле (w)')
+    st.subheader(str(field_h) + '° х ' + str(field_v) + '°')
