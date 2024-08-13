@@ -1,12 +1,13 @@
 import streamlit as st
 import math
 import json
-
 # Opening JSON file with matrix types
 f = open('data.json')
 data = json.load(f)
 f.close()
-
+f = open('criteria.json')
+criterias = list(json.load(f))
+f.close()
 # Adjust width of page
 css='''
 <style>
@@ -58,7 +59,18 @@ with col_data:
         pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=3.45, step=0.01, disabled=False, key='pixel_size2')
 
 target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=0.2, step=0.01)
-threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1, max_value=10000, value=12, step=1)
+col_criteria, col_threshold = st.columns(2)
+
+with col_criteria:
+    criteria = st.selectbox('Выберите критерий', options=criterias, index=0, disabled=not matrix_args_enable, placeholder='Выберите матрицу', key='threshold_enable')
+
+with col_threshold:
+    if criteria == 'Свой':
+        threshold_pixel_count_init = 12
+    else:
+        threshold_pixel_count_init = int(criteria.split()[1])
+    threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1, max_value=10000, value=threshold_pixel_count_init, step=1, disabled=st.session_state.threshold_enable != 'Свой')
+
 distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1)
 pixel_size = pixel_size / 1000000
 focus = (pixel_size * threshold_pixel_count * distance) / target_size
@@ -67,10 +79,16 @@ field_v = 2 * math.atan((pixel_vertical * pixel_size) / (2 * focus))
 field_h = round(math.degrees(field_h), 1)
 field_v = round(math.degrees(field_v), 1)
 st.subheader('Расчитанные данные')
-col_focus, col_field = st.columns(2)
+col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns(4)
 with col_focus:
     st.markdown('Фокусное расстояние (f)')
-    st.subheader(str(round(focus * 1000, 1)) + ' мм')
+    st.markdown('### ' + str(round(focus * 1000, 1)) + ' мм')
 with col_field:
     st.markdown('Угловое поле (w)')
-    st.subheader(str(field_h) + '° х ' + str(field_v) + '°')
+    st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
+with col_resolving_power_lines:
+    st.markdown('Разрешающая способность')
+    st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
+with col_resolving_power_minutes:
+    st.markdown('Разрешающая способность')
+    st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
