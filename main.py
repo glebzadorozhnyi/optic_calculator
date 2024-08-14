@@ -1,13 +1,34 @@
 import streamlit as st
 import math
 import json
-# Opening JSON file with matrix types
-f = open('data.json')
-data = json.load(f)
-f.close()
-f = open('criteria.json')
-criterias = list(json.load(f))
-f.close()
+
+@st.cache_data
+def read_json(filename):
+    file = open(filename)
+    data = json.load(file)
+    file.close()
+    return data
+
+def focus_calc(pixel_size, threshold_pixel_count, distance, target_size):
+    focus = (pixel_size * threshold_pixel_count * distance) / target_size
+    return focus
+
+
+def field_calc(pixel_count, pixel_size, focus):
+    field = 2 * math.atan((pixel_count * pixel_size) / (2 * focus))
+    field = round(math.degrees(field), 1)
+    return field
+
+
+def resolving_rad_calc(focus, pixel_size):
+    return focus / (2 * pixel_size * 1000)
+
+def resolving_minutes_calc(col_resolving_rad):
+    return col_resolving_rad * math.pi / 180
+
+data = read_json('data.json')
+criterias = list(read_json('criteria.json'))
+
 # Adjust width of page
 css='''
 <style>
@@ -15,7 +36,6 @@ css='''
 </style>
 '''
 st.markdown(css, unsafe_allow_html=True)
-
 
 st.title('Оптический калькулятор')
 
@@ -29,11 +49,12 @@ st.subheader('Входные данные')
 col_matrix_type, col_select_tool, col_data = st.columns([1,1.9,1.2])
 
 matrix_types = list(data)
+
 with col_matrix_type:
     matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=0)
+
 with col_select_tool:
     matrixes = list(data[matrix_type])
-
     if matrix_type == 'Своя':
         matrix_args_enable = False
         pixel_horizontal = st.number_input('Количество пикселей в матрице по горизонтали [шт] (n)', min_value=1, max_value=10000, value=1920, step=1, disabled=False)
@@ -46,10 +67,7 @@ with col_select_tool:
         resolution = st.selectbox('Выберите разрешение', options=data[matrix_type][matrix], index=0,
                      disabled=not matrix_args_enable or len(data[matrix_type][matrix]) == 1, placeholder='Выберите разрешение')
 
-
-
 with col_data:
-
     if matrix_args_enable:
         pixel_horizontal = int(resolution.split()[0])
         pixel_vertical = int(resolution.split()[2])
@@ -59,6 +77,7 @@ with col_data:
         pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=3.45, step=0.01, disabled=False, key='pixel_size2')
 
 target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=0.2, step=0.01)
+
 col_criteria, col_threshold = st.columns(2)
 
 with col_criteria:
@@ -73,15 +92,15 @@ with col_threshold:
 
 distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1)
 pixel_size = pixel_size / 1000000
-focus = (pixel_size * threshold_pixel_count * distance) / target_size
-field_h = 2 * math.atan((pixel_horizontal * pixel_size) / (2 * focus))
-field_h = round(math.degrees(field_h), 1)
+focus = focus_calc(pixel_size, threshold_pixel_count, distance, target_size)
 
-field_v = 2 * math.atan((pixel_vertical * pixel_size) / (2 * focus))
-field_v = round(math.degrees(field_v), 1)
+field_h = field_calc(pixel_horizontal, pixel_size, focus)
 
-col_resolving_rad = focus / (2 * pixel_size * 1000)
-col_resolving_minutes = col_resolving_rad * math.pi / 180
+field_v = field_calc(pixel_vertical, pixel_size, focus)
+
+col_resolving_rad = resolving_rad_calc(focus, pixel_size)
+col_resolving_minutes = resolving_minutes_calc(col_resolving_rad)
+
 st.subheader('Расчитанные данные')
 col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns(4)
 with col_focus:
