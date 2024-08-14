@@ -2,6 +2,14 @@ import streamlit as st
 import math
 import json
 
+
+def adjust_width_of_page():
+    css = '''
+    <style>
+        section.main > div {max-width:55rem}
+    </style>
+    '''
+    st.markdown(css, unsafe_allow_html=True)
 @st.cache_data
 def read_json(filename):
     file = open(filename)
@@ -26,16 +34,12 @@ def resolving_rad_calc(focus, pixel_size):
 def resolving_minutes_calc(col_resolving_rad):
     return col_resolving_rad * math.pi / 180
 
+#def draw_head():
+
 data = read_json('data.json')
 criterias = list(read_json('criteria.json'))
 
-# Adjust width of page
-css='''
-<style>
-    section.main > div {max-width:55rem}
-</style>
-'''
-st.markdown(css, unsafe_allow_html=True)
+adjust_width_of_page()
 
 st.title('Оптический калькулятор')
 
