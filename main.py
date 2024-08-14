@@ -75,9 +75,13 @@ distance = st.number_input('Требуемая дальность [м] (L)', min
 pixel_size = pixel_size / 1000000
 focus = (pixel_size * threshold_pixel_count * distance) / target_size
 field_h = 2 * math.atan((pixel_horizontal * pixel_size) / (2 * focus))
-field_v = 2 * math.atan((pixel_vertical * pixel_size) / (2 * focus))
 field_h = round(math.degrees(field_h), 1)
+
+field_v = 2 * math.atan((pixel_vertical * pixel_size) / (2 * focus))
 field_v = round(math.degrees(field_v), 1)
+
+col_resolving_rad = focus / (2 * pixel_size * 1000)
+col_resolving_minutes = col_resolving_rad * math.pi / 180
 st.subheader('Расчитанные данные')
 col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns(4)
 with col_focus:
@@ -88,7 +92,10 @@ with col_field:
     st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
 with col_resolving_power_lines:
     st.markdown('Разрешающая способность')
-    st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
+    st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
 with col_resolving_power_minutes:
     st.markdown('Разрешающая способность')
-    st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
+    st.markdown('### ' + str(round(col_resolving_minutes * 60, 2)) + ' мин⁻¹')
+
+st.markdown(':small_blue_diamond: Реальное угловое поле будет отличаться от расчитанного из-за оптических абераций объектива')
+st.markdown(':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
