@@ -76,8 +76,10 @@ def draw_head(data):
 
             matrix = st.selectbox('Выберите матрицу', options=matrixes, index=0,
                                   disabled=not matrix_args_enable, placeholder='Выберите матрицу')
-            resolution = st.selectbox('Выберите разрешение', options=data[matrix_type][matrix], index=0,
-                                      disabled=len(data[matrix_type][matrix]) == 1)
+
+            resolutions = list(data[matrix_type][matrix])
+            resolution = st.selectbox('Выберите разрешение', options=resolutions, index=0,
+                                      disabled=len(resolutions) == 1)
 
     with col_data:
         if matrix_args_enable:
@@ -112,16 +114,15 @@ def criteria_block(criterias):
                                                 key='threshold_pixel_count')
     return threshold_pixel_count
 
-def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1, default_focus=100):
+def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1, default_focus=0.1):
+
+    default_focus = int(default_focus * 1000)
 
     col_select, col_focus, col_field = st.columns([1, 2, 2])
 
     with col_select:
 
         focus_or_field_selection = st.radio('Расчёт по', ['Фокус','Угловое поле'], index=0)
-
-
-
 
 
     if focus_or_field_selection == 'Фокус':

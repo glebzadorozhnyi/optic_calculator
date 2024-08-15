@@ -19,15 +19,14 @@ target_size = Focus.target_size_block()
 
 threshold_pixel_count = Focus.criteria_block(criterias)
 st.markdown('\n')
-default_focus = Focus.get_variable_from_session_state('default_focus', 0.1) * 1000
 
-focus = Focus.focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=2, default_focus=int(default_focus))
+focus = Focus.focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=2)
 
 st.session_state['default_focus'] = focus
 
 distance = Focus.distance_calc(focus, threshold_pixel_count, pixel_size, target_size)
 
 st.subheader('Расчитанные данные')
-st.markdown('Дальность наблюдения согласно выбранному критерию (L)')
+st.markdown('Дальность наблюдения (L) согласно выбранному критерию')
 st.markdown('### ' + str(round(distance, 1)) + ' м')
 
