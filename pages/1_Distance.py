@@ -1,19 +1,22 @@
-from Focus import read_json, focus_calc, field_calc, resolving_rad_calc, resolving_minutes_calc, adjust_width_of_page, draw_head, criteria_block, target_size_block
+import Focus
 import streamlit as st
 
 
 
-adjust_width_of_page(st)
+Focus.adjust_width_of_page()
 
-data = read_json('data.json')
-criterias = list(read_json('criteria.json'))
+data = Focus.read_json('data.json')
+criterias = list(Focus.read_json('criteria.json'))
 
 st.title('Оптический калькулятор')
 
 st.markdown('Расчёт предельной дистанции наблюдения цели для заданной матрицы, размера цели, критерия наблюдения (обнаружение, распознавание) и фокуса (или углового поля) объектива.')
 
-pixel_horizontal, pixel_vertical, pixel_size = draw_head(st, data)
+pixel_horizontal, pixel_vertical, pixel_size = Focus.draw_head(data)
+pixel_size = pixel_size / 1000000
 
-target_size = target_size_block(st)
+target_size = Focus.target_size_block()
 
-criteria_block(st,criterias)
+Focus.criteria_block(criterias)
+st.markdown('\n')
+focus = Focus.focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=2)

@@ -3,13 +3,15 @@ import math
 import json
 
 
-def adjust_width_of_page(st):
+def adjust_width_of_page():
     css = '''
     <style>
         section.main > div {max-width:55rem}
     </style>
     '''
     st.markdown(css, unsafe_allow_html=True)
+
+
 @st.cache_data
 def read_json(filename):
     file = open(filename)
@@ -21,10 +23,15 @@ def focus_calc(pixel_size, threshold_pixel_count, distance, target_size):
     focus = (pixel_size * threshold_pixel_count * distance) / target_size
     return focus
 
+def focus_calc_alt(field_h, pixel_horizontal, pixel_size):
+    field_h = math.radians(field_h) / 2
+    focus = (pixel_size * pixel_horizontal * 0.5) / math.tan(field_h)
+    return focus
 
-def field_calc(pixel_count, pixel_size, focus):
+
+def field_calc(pixel_count, pixel_size, focus, accuracy=1):
     field = 2 * math.atan((pixel_count * pixel_size) / (2 * focus))
-    field = round(math.degrees(field), 1)
+    field = round(math.degrees(field), accuracy)
     return field
 
 
@@ -34,7 +41,7 @@ def resolving_rad_calc(focus, pixel_size):
 def resolving_minutes_calc(col_resolving_rad):
     return col_resolving_rad * math.pi / 180
 
-def draw_head(st, data):
+def draw_head(data):
     st.image('shema.jpg', )
 
     st.subheader('Входные данные')
@@ -75,11 +82,11 @@ def draw_head(st, data):
                                          step=0.01, disabled=False, key='pixel_size2')
     return pixel_horizontal, pixel_vertical, pixel_size
 
-def target_size_block(st):
+def target_size_block():
     target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=1.6, step=0.01)
     return target_size
 
-def criteria_block(st, criterias):
+def criteria_block(criterias):
     col_criteria, col_threshold = st.columns(2)
 
     with col_criteria:
@@ -98,23 +105,81 @@ def criteria_block(st, criterias):
     return threshold_pixel_count
 
 
+def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
+
+    col_select, col_focus, col_field = st.columns([1, 2, 2])
+
+    with col_select:
+
+        focus_or_field_selection = st.radio('Расчёт по', ['Фокус','Угловое поле'], index=0)
+
+
+
+
+
+    if focus_or_field_selection == 'Фокус':
+
+        with col_focus:
+            if 'focus' in st.session_state:
+                default_focus = st.session_state.focus
+            else:
+                default_focus = 100
+            focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=1,
+                                    max_value=10000, value=default_focus, step=1,
+                                    disabled=focus_or_field_selection == 'Угловое поле', key='focus')
+
+        st.session_state.field_h = field_calc(pixel_horizontal, pixel_size, focus / 1000, accuracy)
+        st.session_state.field_v = field_calc(pixel_vertical, pixel_size, focus / 1000, accuracy)
+
+        with col_field:
+
+            st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
+                                               max_value=359.0, step=0.01, disabled=True, key='field_h')
+
+            st.number_input('Угловое поле по вертикали [°] (w)', min_value=0.01,
+                                               max_value=359.0, step=0.01, disabled=True, key='field_v')
+    else:
+
+        with col_field:
+            if 'field_h' in st.session_state:
+                default_field_h = st.session_state.field_h
+            else:
+                default_field_h = 3.0
+            st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
+                                               max_value=359.0, value=default_field_h, step=0.01, key='field_h')
+            st.session_state.field_v = st.session_state.field_h * pixel_vertical/ pixel_horizontal
+            st.session_state.focus = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
+
+            st.number_input('Угловое поле по вертикали [°] (w)', min_value=0.01,
+                                               max_value=359.0, step=0.01, disabled=True, key='field_v')
+        with col_focus:
+            focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=1,
+                                    max_value=10000, step=1,
+                                    disabled=True, key='focus')
+    return focus
+
+
+
+
+
+
 if __name__ == "__main__":
 
     data = read_json('data.json')
     criterias = list(read_json('criteria.json'))
 
-    adjust_width_of_page(st)
+    adjust_width_of_page()
 
     st.title('Оптический калькулятор')
 
     st.markdown('''Расчёт фокусного расстояния объектива для заданной матрицы, размера цели, критерия наблюдения (обнаружение, распознавание) и дальности наблюдения.\n
 Угловое поле расчитывается исходя из получившегося фокусного расстояния и заданой матрицы.''')
 
-    pixel_horizontal, pixel_vertical, pixel_size = draw_head(st, data)
+    pixel_horizontal, pixel_vertical, pixel_size = draw_head(data)
 
-    target_size = target_size_block(st)
+    target_size = target_size_block()
 
-    threshold_pixel_count = criteria_block(st, criterias)
+    threshold_pixel_count = criteria_block(criterias)
 
     distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1)
     pixel_size = pixel_size / 1000000
