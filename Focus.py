@@ -61,7 +61,8 @@ def draw_head(data):
     matrix_types = list(data)
 
     with col_matrix_type:
-        matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=0)
+        default_matrix_type_index = get_variable_from_session_state('matrix_type_index', 0)
+        matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=default_matrix_type_index)
 
     with col_select_tool:
         matrixes = list(data[matrix_type])
@@ -73,12 +74,24 @@ def draw_head(data):
                                              max_value=10000, value=1080, step=1, disabled=False)
         else:
             matrix_args_enable = True
+            previous_matrix_type = st.session_state.pop('matrix_type_index', 'none')
+            if matrix_types.index(matrix_type) == previous_matrix_type:
+                default_matrix_index = get_variable_from_session_state('matrix_index', 0)
+            else:
+                default_matrix_index = 0
 
-            matrix = st.selectbox('Выберите матрицу', options=matrixes, index=0,
+
+            matrix = st.selectbox('Выберите матрицу', options=matrixes, index=default_matrix_index,
                                   disabled=not matrix_args_enable, placeholder='Выберите матрицу')
 
+            previous_matrix_index = st.session_state.pop('matrix_index', 'none')
+            if matrix_types.index(matrix_type) == previous_matrix_type and matrixes.index(matrix) == previous_matrix_index:
+                default_resolution_index = get_variable_from_session_state('resolution_index', 0)
+            else:
+                default_resolution_index = 0
             resolutions = list(data[matrix_type][matrix])
-            resolution = st.selectbox('Выберите разрешение', options=resolutions, index=0,
+
+            resolution = st.selectbox('Выберите разрешение', options=resolutions, index=default_resolution_index,
                                       disabled=len(resolutions) == 1)
 
     with col_data:
@@ -92,6 +105,10 @@ def draw_head(data):
         else:
             pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=3.45,
                                          step=0.01, disabled=False, key='pixel_size')
+
+    st.session_state['matrix_type_index'] = matrix_types.index(matrix_type)
+    st.session_state['matrix_index'] = matrixes.index(matrix)
+    st.session_state['resolution_index'] = resolutions.index(resolution)
     return pixel_horizontal, pixel_vertical, pixel_size
 def target_size_block():
     target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=1.6, step=0.01)
