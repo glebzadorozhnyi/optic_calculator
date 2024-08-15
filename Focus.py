@@ -2,7 +2,7 @@ import streamlit as st
 import math
 import json
 
-
+@st.cache_data
 def adjust_width_of_page():
     css = '''
     <style>
@@ -41,6 +41,16 @@ def resolving_rad_calc(focus, pixel_size):
 def resolving_minutes_calc(col_resolving_rad):
     return col_resolving_rad * math.pi / 180
 
+def distance_calc(focus, threshold_pixel_count, pixel_size, target_size):
+    distance = (focus * target_size) / (pixel_size * threshold_pixel_count)
+    return distance
+
+def get_variable_from_session_state(variable_name, default_value=None):
+    if variable_name in st.session_state:
+        return st.session_state[variable_name]
+    else:
+        return default_value
+
 def draw_head(data):
     st.image('shema.jpg', )
 
@@ -51,7 +61,9 @@ def draw_head(data):
     matrix_types = list(data)
 
     with col_matrix_type:
-        matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=0)
+        default_index = get_variable_from_session_state('matrix_index', 0)
+        matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=default_index)
+        st.session_state['matrix_index'] = matrix_types.index(matrix_type)
 
     with col_select_tool:
         matrixes = list(data[matrix_type])
@@ -81,11 +93,9 @@ def draw_head(data):
             pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=3.45,
                                          step=0.01, disabled=False, key='pixel_size2')
     return pixel_horizontal, pixel_vertical, pixel_size
-
 def target_size_block():
     target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=1.6, step=0.01)
     return target_size
-
 def criteria_block(criterias):
     col_criteria, col_threshold = st.columns(2)
 
@@ -104,8 +114,7 @@ def criteria_block(criterias):
                                                 key='threshold_pixel_count')
     return threshold_pixel_count
 
-
-def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
+def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1, default_focus=100):
 
     col_select, col_focus, col_field = st.columns([1, 2, 2])
 
@@ -122,8 +131,6 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
         with col_focus:
             if 'focus' in st.session_state:
                 default_focus = st.session_state.focus
-            else:
-                default_focus = 100
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=1,
                                     max_value=10000, value=default_focus, step=1,
                                     disabled=focus_or_field_selection == 'Угловое поле', key='focus')
@@ -156,7 +163,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=1,
                                     max_value=10000, step=1,
                                     disabled=True, key='focus')
-    return focus
+    return focus / 1000
 
 
 
@@ -164,7 +171,6 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
 
 
 if __name__ == "__main__":
-
     data = read_json('data.json')
     criterias = list(read_json('criteria.json'))
 
@@ -181,7 +187,7 @@ if __name__ == "__main__":
 
     threshold_pixel_count = criteria_block(criterias)
 
-    distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1)
+    distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1, key='flag')
     pixel_size = pixel_size / 1000000
     focus = focus_calc(pixel_size, threshold_pixel_count, distance, target_size)
 
