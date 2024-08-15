@@ -61,9 +61,7 @@ def draw_head(data):
     matrix_types = list(data)
 
     with col_matrix_type:
-        default_index = get_variable_from_session_state('matrix_index', 0)
-        matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=default_index)
-        st.session_state['matrix_index'] = matrix_types.index(matrix_type)
+        matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=0)
 
     with col_select_tool:
         matrixes = list(data[matrix_type])
@@ -72,26 +70,26 @@ def draw_head(data):
             pixel_horizontal = st.number_input('Количество пикселей в матрице по горизонтали [шт] (n)', min_value=1,
                                                max_value=10000, value=1920, step=1, disabled=False)
             pixel_vertical = st.number_input('Количество пикселей в матрице по вертикали [шт] (n)', min_value=1,
-                                             max_value=10000, value=1080, step=1, disabled=matrix_args_enable)
+                                             max_value=10000, value=1080, step=1, disabled=False)
         else:
             matrix_args_enable = True
 
             matrix = st.selectbox('Выберите матрицу', options=matrixes, index=0,
                                   disabled=not matrix_args_enable, placeholder='Выберите матрицу')
             resolution = st.selectbox('Выберите разрешение', options=data[matrix_type][matrix], index=0,
-                                      disabled=not matrix_args_enable or len(data[matrix_type][matrix]) == 1,
-                                      placeholder='Выберите разрешение')
+                                      disabled=len(data[matrix_type][matrix]) == 1)
 
     with col_data:
         if matrix_args_enable:
             pixel_horizontal = int(resolution.split()[0])
             pixel_vertical = int(resolution.split()[2])
             pixel_size = float(list(data[matrix_type][matrix][resolution])[0])
-            st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=pixel_size, step=0.01,
+            st.session_state['pixel_size'] = pixel_size
+            st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, step=0.01,
                             disabled=True, key='pixel_size')
         else:
             pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=3.45,
-                                         step=0.01, disabled=False, key='pixel_size2')
+                                         step=0.01, disabled=False, key='pixel_size')
     return pixel_horizontal, pixel_vertical, pixel_size
 def target_size_block():
     target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=1.6, step=0.01)
