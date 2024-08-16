@@ -45,6 +45,13 @@ def distance_calc(focus, threshold_pixel_count, pixel_size, target_size):
     distance = (focus * target_size) / (pixel_size * threshold_pixel_count)
     return distance
 
+def pixel_count_calc(focus, target_size, distance, pixel_size):
+    threshold_pixel_count = (focus * target_size) / (distance * pixel_size)
+    threshold_pixel_count = int(round(threshold_pixel_count))
+    st.session_state['previous_th_pixel_count'] = threshold_pixel_count
+    st.session_state['threshold_enable'] = 'Свой критерий'
+    return threshold_pixel_count
+
 def get_variable_from_session_state(variable_name, default_value=None):
     if variable_name in st.session_state:
         return st.session_state[variable_name]
@@ -142,6 +149,13 @@ def criteria_block(criterias):
         st.session_state['previous_th_pixel_count'] = threshold_pixel_count
     return threshold_pixel_count
 
+def distance_block():
+    default_distance = int(get_variable_from_session_state('default_distance', 1000))
+    distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=default_distance, step=1)
+    st.session_state['default_distance'] = distance
+    return  distance
+
+
 def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
 
     col_select, col_focus, col_field = st.columns([1, 2, 2])
@@ -213,7 +227,9 @@ if __name__ == "__main__":
 
     threshold_pixel_count = criteria_block(criterias)
 
-    distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1, key='flag')
+    distance = distance_block()
+
+
     pixel_size = pixel_size / 1000000
     focus = focus_calc(pixel_size, threshold_pixel_count, distance, target_size)
     st.session_state['default_focus'] = focus

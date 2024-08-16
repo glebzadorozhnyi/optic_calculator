@@ -26,6 +26,8 @@ st.session_state['default_focus'] = focus
 
 distance = Focus.distance_calc(focus, threshold_pixel_count, pixel_size, target_size)
 
+st.session_state['default_distance'] = distance
+
 col_resolving_rad = Focus.resolving_rad_calc(focus, pixel_size)
 col_resolving_minutes = Focus.resolving_minutes_calc(col_resolving_rad)
 
