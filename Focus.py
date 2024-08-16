@@ -117,29 +117,32 @@ def draw_head(data):
     st.session_state['previous_pixel_vertical'] = pixel_vertical
     return pixel_horizontal, pixel_vertical, pixel_size
 def target_size_block():
-    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=1.6, step=0.01)
+    default_target_size = get_variable_from_session_state('previous_target_size', 1.6)
+    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=default_target_size, step=0.01)
+    st.session_state['previous_target_size'] = target_size
     return target_size
 def criteria_block(criterias):
     col_criteria, col_threshold = st.columns(2)
 
     with col_criteria:
-        criteria = st.selectbox('Выберите критерий', options=criterias, index=0, placeholder='Выберите матрицу',
+        default_criteria = get_variable_from_session_state('threshold_enable', 'Обнаружение 2')
+        st.session_state['threshold_enable'] = default_criteria
+        criteria = st.selectbox('Выберите критерий', options=criterias, placeholder='Выберите матрицу',
                                 key='threshold_enable')
 
     with col_threshold:
         if criteria == 'Свой критерий':
-            threshold_pixel_count_init = st.session_state.threshold_pixel_count
+            threshold_pixel_count_init = get_variable_from_session_state('previous_th_pixel_count', 18)
         else:
             threshold_pixel_count_init = int(criteria.split()[1])
+
         threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1,
                                                 max_value=10000, value=threshold_pixel_count_init, step=1,
-                                                disabled=st.session_state.threshold_enable != 'Свой критерий',
-                                                key='threshold_pixel_count')
+                                                disabled=st.session_state.threshold_enable != 'Свой критерий')
+        st.session_state['previous_th_pixel_count'] = threshold_pixel_count
     return threshold_pixel_count
 
-def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1, default_focus=0.1):
-
-    default_focus = int(default_focus * 1000)
+def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
 
     col_select, col_focus, col_field = st.columns([1, 2, 2])
 
@@ -151,10 +154,11 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1, def
     if focus_or_field_selection == 'Фокус':
 
         with col_focus:
-            if 'focus' in st.session_state:
-                default_focus = st.session_state.focus
-            focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=1,
-                                    max_value=10000, value=default_focus, step=1,
+            default_focus = get_variable_from_session_state('default_focus', 0.1)
+            default_focus = default_focus * 1000
+
+            focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
+                                    max_value=10000.0, value=default_focus, step=0.01,
                                     disabled=focus_or_field_selection == 'Угловое поле', key='focus')
 
         st.session_state.field_h = field_calc(pixel_horizontal, pixel_size, focus / 1000, accuracy)
@@ -182,8 +186,8 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1, def
             st.number_input('Угловое поле по вертикали [°] (w)', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
         with col_focus:
-            focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=1,
-                                    max_value=10000, step=1,
+            focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
+                                    max_value=10000.0, step=0.01,
                                     disabled=True, key='focus')
     return focus / 1000
 
@@ -212,6 +216,7 @@ if __name__ == "__main__":
     distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=1000, step=1, key='flag')
     pixel_size = pixel_size / 1000000
     focus = focus_calc(pixel_size, threshold_pixel_count, distance, target_size)
+    st.session_state['default_focus'] = focus
 
     field_h = field_calc(pixel_horizontal, pixel_size, focus)
 
@@ -224,15 +229,21 @@ if __name__ == "__main__":
     col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns(4)
     with col_focus:
         st.markdown('Фокусное расстояние (f)')
-        st.markdown('### ' + str(round(focus * 1000, 1)) + ' мм')
     with col_field:
         st.markdown('Угловое поле (w)')
-        st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
     with col_resolving_power_lines:
         st.markdown('Разрешающая способность')
-        st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
     with col_resolving_power_minutes:
         st.markdown('Разрешающая способность')
+
+    col_focus2, col_field2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(4)
+    with col_focus2:
+        st.markdown('### ' + str(round(focus * 1000, 1)) + ' мм')
+    with col_field2:
+        st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
+    with col_resolving_power_lines2:
+        st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
+    with col_resolving_power_minutes2:
         st.markdown('### ' + str(round(col_resolving_minutes * 60, 2)) + ' мин⁻¹')
 
     st.markdown(':small_blue_diamond: Реальное угловое поле будет отличаться от расчитанного из-за оптических абераций объектива')

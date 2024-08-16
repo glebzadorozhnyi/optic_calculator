@@ -26,7 +26,29 @@ st.session_state['default_focus'] = focus
 
 distance = Focus.distance_calc(focus, threshold_pixel_count, pixel_size, target_size)
 
-st.subheader('Расчитанные данные')
-st.markdown('Дальность наблюдения (L) согласно выбранному критерию')
-st.markdown('### ' + str(round(distance, 1)) + ' м')
+col_resolving_rad = Focus.resolving_rad_calc(focus, pixel_size)
+col_resolving_minutes = Focus.resolving_minutes_calc(col_resolving_rad)
 
+st.subheader('Расчитанные данные')
+
+col_distance, col_resolving_power_lines, col_resolving_power_minutes = st.columns(3)
+
+
+with col_distance:
+    st.markdown('Дальность наблюдения (L) согласно выбранному критерию')
+
+with col_resolving_power_lines:
+    st.markdown('Разрешающая способность')
+with col_resolving_power_minutes:
+    st.markdown('Разрешающая способность')
+
+col_distance2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(3)
+with col_distance2:
+    st.markdown('### ' + str(round(distance, 1)) + ' м')
+
+with col_resolving_power_lines2:
+    st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
+with col_resolving_power_minutes2:
+    st.markdown('### ' + str(round(col_resolving_minutes * 60, 2)) + ' мин⁻¹')
+
+st.markdown(':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
