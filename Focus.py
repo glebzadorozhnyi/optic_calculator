@@ -61,8 +61,9 @@ def draw_head(data):
     matrix_types = list(data)
 
     with col_matrix_type:
-        default_matrix_type_index = get_variable_from_session_state('matrix_type_index', 0)
-        matrix_type = st.radio('Выберите тип матрицы', matrix_types, index=default_matrix_type_index)
+        default_matrix_type = get_variable_from_session_state('matrix_type', 'ТВ')
+        st.session_state['matrix_type'] = default_matrix_type
+        matrix_type = st.radio('Выберите тип матрицы', matrix_types, key='matrix_type')
 
     with col_select_tool:
         matrixes = list(data[matrix_type])
@@ -76,8 +77,7 @@ def draw_head(data):
                                              max_value=10000, value=default_pixel_vertical, step=1, disabled=False)
         else:
             matrix_args_enable = True
-            previous_matrix_type = st.session_state.pop('matrix_type_index', 'none')
-            if matrix_types.index(matrix_type) == previous_matrix_type:
+            if st.session_state.pop('previous_matrix_type', 'NO') == matrix_type:
                 default_matrix_index = get_variable_from_session_state('matrix_index', 0)
             else:
                 default_matrix_index = 0
@@ -87,7 +87,7 @@ def draw_head(data):
                                   disabled=not matrix_args_enable, placeholder='Выберите матрицу')
 
             previous_matrix_index = st.session_state.pop('matrix_index', 'none')
-            if matrix_types.index(matrix_type) == previous_matrix_type and matrixes.index(matrix) == previous_matrix_index:
+            if st.session_state.pop('previous_matrix_type', 'NO') == matrix_type and matrixes.index(matrix) == previous_matrix_index:
                 default_resolution_index = get_variable_from_session_state('resolution_index', 0)
             else:
                 default_resolution_index = 0
@@ -108,8 +108,7 @@ def draw_head(data):
             default_pixel_size = get_variable_from_session_state('previous_pixel_size', 3.45)
             pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, value=default_pixel_size,
                                          step=0.01, disabled=False, key='pixel_size')
-
-    st.session_state['matrix_type_index'] = matrix_types.index(matrix_type)
+    st.session_state['previous_matrix_type'] = matrix_type
     if matrix_type != 'Своя':
         st.session_state['matrix_index'] = matrixes.index(matrix)
         st.session_state['resolution_index'] = resolutions.index(resolution)
