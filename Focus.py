@@ -39,7 +39,7 @@ def resolving_rad_calc(focus, pixel_size):
     return focus / (2 * pixel_size)
 
 def resolving_minutes_calc(col_resolving_rad):
-    return col_resolving_rad * math.pi / 180
+    return col_resolving_rad * math.pi / (180*60)
 
 def distance_calc(focus, threshold_pixel_count, pixel_size, target_size):
     distance = (focus * target_size) / (pixel_size * threshold_pixel_count)
@@ -131,7 +131,7 @@ def draw_head(data):
 def target_size_block():
     default_target_size = get_variable_from_session_state('target_size', 1.6)
     st.session_state['target_size'] = default_target_size
-    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.1, key='target_size')
+    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.001, key='target_size')
     st.session_state['previous_target_size'] = target_size
     return target_size
 def criteria_block(criterias):
@@ -191,7 +191,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
             st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_h')
 
-            st.number_input('Угловое поле по вертикали [°] (w)', min_value=0.01,
+            st.number_input('Угловое поле по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
     else:
 
@@ -204,7 +204,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
             st.session_state['field_v'] = st.session_state.field_h * pixel_vertical / pixel_horizontal
             st.session_state['focus'] = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
 
-            st.number_input('Угловое поле по вертикали [°] (w)', min_value=0.01,
+            st.number_input('Угловое поле по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
         with col_focus:
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
@@ -222,7 +222,7 @@ if __name__ == "__main__":
 
     st.title('Оптический калькулятор')
 
-    st.markdown('''Расчёт фокусного расстояния объектива для заданной матрицы, размера цели, критерия наблюдения (обнаружение, распознавание) и дальности наблюдения.\n
+    st.markdown('''Расчёт фокусного расстояния объектива для заданной матрицы, размера объекта, критерия наблюдения (обнаружение, распознавание) и дальности наблюдения.\n
 Угловое поле расчитывается исходя из получившегося фокусного расстояния и заданой матрицы.''')
 
     pixel_horizontal, pixel_vertical, pixel_size = draw_head(data)
@@ -266,7 +266,7 @@ if __name__ == "__main__":
     with col_resolving_power_lines2:
         st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
     with col_resolving_power_minutes2:
-        st.markdown('### ' + str(round(col_resolving_minutes * 60, 2)) + ' мин⁻¹')
+        st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 
     st.markdown(':small_blue_diamond: Реальное угловое поле будет отличаться от расчитанного из-за оптических абераций объектива')
     st.markdown(':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')

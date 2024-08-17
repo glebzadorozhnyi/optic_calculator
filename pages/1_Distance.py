@@ -10,7 +10,7 @@ criterias = list(Focus.read_json('criteria.json'))
 
 st.title('Оптический калькулятор')
 
-st.markdown('Расчёт предельной дистанции наблюдения цели для заданной матрицы, размера цели, критерия наблюдения (обнаружение, распознавание) и фокуса (или углового поля) объектива.')
+st.markdown('Расчёт предельной дистанции наблюдения объекта для заданной матрицы, размера цели, критерия наблюдения (обнаружение, распознавание) и фокуса (или углового поля) объектива.')
 
 pixel_horizontal, pixel_vertical, pixel_size = Focus.draw_head(data)
 pixel_size = pixel_size / 1000000
@@ -49,6 +49,6 @@ with col_distance2:
 with col_resolving_power_lines2:
     st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
 with col_resolving_power_minutes2:
-    st.markdown('### ' + str(round(col_resolving_minutes * 60, 2)) + ' мин⁻¹')
+    st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 
 st.markdown(':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
