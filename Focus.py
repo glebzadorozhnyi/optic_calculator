@@ -127,7 +127,7 @@ def draw_head(data):
 def target_size_block():
     default_target_size = get_variable_from_session_state('target_size', 1.6)
     st.session_state['target_size'] = default_target_size
-    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.01, key='target_size')
+    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.1, key='target_size')
     st.session_state['previous_target_size'] = target_size
     return target_size
 def criteria_block(criterias):
@@ -207,9 +207,6 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
                                     max_value=10000.0, step=10.0,
                                     disabled=True, key='focus')
     return focus
-
-
-
 
 
 
