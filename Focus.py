@@ -48,7 +48,7 @@ def distance_calc(focus, threshold_pixel_count, pixel_size, target_size):
 def pixel_count_calc(focus, target_size, distance, pixel_size):
     threshold_pixel_count = (focus * target_size) / (distance * pixel_size)
     threshold_pixel_count = int(round(threshold_pixel_count))
-    st.session_state['previous_th_pixel_count'] = threshold_pixel_count
+    st.session_state['threshold_pixel_count'] = threshold_pixel_count
     st.session_state['threshold_enable'] = 'Свой критерий'
     return threshold_pixel_count
 
@@ -140,14 +140,16 @@ def criteria_block(criterias):
 
     with col_threshold:
         if criteria == 'Свой критерий':
-            threshold_pixel_count_init = get_variable_from_session_state('previous_th_pixel_count', 18)
+            default_threshold_pixel_count = get_variable_from_session_state('threshold_pixel_count', 18)
         else:
-            threshold_pixel_count_init = int(criteria.split()[1])
+            default_threshold_pixel_count = int(criteria.split()[1])
+
+        st.session_state['threshold_pixel_count'] = default_threshold_pixel_count
 
         threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1,
-                                                max_value=10000, value=threshold_pixel_count_init, step=1,
-                                                disabled=st.session_state.threshold_enable != 'Свой критерий')
-        st.session_state['previous_th_pixel_count'] = threshold_pixel_count
+                                                max_value=10000, step=1,
+                                                disabled=st.session_state.threshold_enable != 'Свой критерий',
+                                                key='threshold_pixel_count')
     return threshold_pixel_count
 
 def distance_block():
