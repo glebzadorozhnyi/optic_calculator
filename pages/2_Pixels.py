@@ -19,19 +19,16 @@ target_size = Focus.target_size_block()
 
 distance = Focus.distance_block()
 
-focus = Focus.focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=2)
+focus = Focus.focus_or_field(pixel_horizontal, pixel_vertical, pixel_size)
 
-st.session_state['default_focus'] = focus
-
-
-col_resolving_rad = Focus.resolving_rad_calc(focus, pixel_size)
+col_resolving_rad = Focus.resolving_rad_calc(focus / 1000, pixel_size)
 col_resolving_minutes = Focus.resolving_minutes_calc(col_resolving_rad)
 
 st.subheader('Расчитанные данные')
 
 col_pixels, col_resolving_power_lines, col_resolving_power_minutes = st.columns(3)
 
-threshold_pixel_count = Focus.pixel_count_calc(focus, target_size, distance, pixel_size)
+threshold_pixel_count = Focus.pixel_count_calc(focus / 1000, target_size, distance, pixel_size)
 
 
 with col_pixels:
@@ -44,7 +41,7 @@ with col_resolving_power_minutes:
 
 col_pixels2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(3)
 with col_pixels2:
-    st.markdown('### ' + str(threshold_pixel_count,) + ' шт')
+    st.markdown('### ' + str(round(threshold_pixel_count,2)) + ' пикс')
 with col_resolving_power_lines2:
     st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
 with col_resolving_power_minutes2:

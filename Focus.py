@@ -29,14 +29,14 @@ def focus_calc_alt(field_h, pixel_horizontal, pixel_size):
     return focus
 
 
-def field_calc(pixel_count, pixel_size, focus, accuracy=1):
+def field_calc(pixel_count, pixel_size, focus):
     field = 2 * math.atan((pixel_count * pixel_size) / (2 * focus))
-    field = round(math.degrees(field), accuracy)
+    field = math.degrees(field)
     return field
 
 
 def resolving_rad_calc(focus, pixel_size):
-    return focus / (2 * pixel_size * 1000)
+    return focus / (2 * pixel_size)
 
 def resolving_minutes_calc(col_resolving_rad):
     return col_resolving_rad * math.pi / 180
@@ -47,7 +47,7 @@ def distance_calc(focus, threshold_pixel_count, pixel_size, target_size):
 
 def pixel_count_calc(focus, target_size, distance, pixel_size):
     threshold_pixel_count = (focus * target_size) / (distance * pixel_size)
-    threshold_pixel_count = int(round(threshold_pixel_count))
+    threshold_pixel_count = threshold_pixel_count
     st.session_state['threshold_pixel_count'] = threshold_pixel_count
     st.session_state['threshold_enable'] = 'Свой критерий'
     return threshold_pixel_count
@@ -142,12 +142,12 @@ def criteria_block(criterias):
         if criteria == 'Свой критерий':
             default_threshold_pixel_count = get_variable_from_session_state('threshold_pixel_count', 18)
         else:
-            default_threshold_pixel_count = int(criteria.split()[1])
+            default_threshold_pixel_count = float(criteria.split()[1])
 
         st.session_state['threshold_pixel_count'] = default_threshold_pixel_count
 
-        threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=1,
-                                                max_value=10000, step=1,
+        threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=0.1,
+                                                max_value=10000.0, step=1.0,
                                                 disabled=st.session_state.threshold_enable != 'Свой критерий',
                                                 key='threshold_pixel_count')
     return threshold_pixel_count
@@ -159,7 +159,7 @@ def distance_block():
     return  distance
 
 
-def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
+def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
 
     col_select, col_focus, col_field = st.columns([1, 2, 2])
 
@@ -171,15 +171,15 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
     if focus_or_field_selection == 'Фокус':
 
         with col_focus:
-            default_focus = get_variable_from_session_state('default_focus', 0.1)
-            default_focus = default_focus * 1000
+            default_focus = get_variable_from_session_state('focus', 100)
+            st.session_state['focus'] = default_focus
 
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
-                                    max_value=10000.0, value=default_focus, step=0.01,
+                                    max_value=10000.0, step=10.0,
                                     disabled=focus_or_field_selection == 'Угловое поле', key='focus')
 
-        st.session_state.field_h = field_calc(pixel_horizontal, pixel_size, focus / 1000, accuracy)
-        st.session_state.field_v = field_calc(pixel_vertical, pixel_size, focus / 1000, accuracy)
+        st.session_state['field_h'] = field_calc(pixel_horizontal, pixel_size, focus / 1000)
+        st.session_state['field_v'] = field_calc(pixel_vertical, pixel_size, focus / 1000)
 
         with col_field:
 
@@ -191,22 +191,21 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size, accuracy=1):
     else:
 
         with col_field:
-            if 'field_h' in st.session_state:
-                default_field_h = st.session_state.field_h
-            else:
-                default_field_h = 3.0
+            default_field_h = get_variable_from_session_state('field_h', 3.0)
+            st.session_state['field_h'] = default_field_h
             st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
-                                               max_value=359.0, value=default_field_h, step=0.01, key='field_h')
-            st.session_state.field_v = st.session_state.field_h * pixel_vertical/ pixel_horizontal
-            st.session_state.focus = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
+                                               max_value=359.0, step=1.0, key='field_h')
+
+            st.session_state['field_v'] = st.session_state.field_h * pixel_vertical / pixel_horizontal
+            st.session_state['focus'] = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
 
             st.number_input('Угловое поле по вертикали [°] (w)', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
         with col_focus:
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
-                                    max_value=10000.0, step=0.01,
+                                    max_value=10000.0, step=10.0,
                                     disabled=True, key='focus')
-    return focus / 1000
+    return focus
 
 
 
@@ -234,14 +233,16 @@ if __name__ == "__main__":
 
 
     pixel_size = pixel_size / 1000000
-    focus = focus_calc(pixel_size, threshold_pixel_count, distance, target_size)
-    st.session_state['default_focus'] = focus
 
-    field_h = field_calc(pixel_horizontal, pixel_size, focus)
+    focus = focus_calc(pixel_size, threshold_pixel_count, distance, target_size) * 1000
 
-    field_v = field_calc(pixel_vertical, pixel_size, focus)
+    st.session_state['focus'] = focus
 
-    col_resolving_rad = resolving_rad_calc(focus, pixel_size)
+    field_h = field_calc(pixel_horizontal, pixel_size, focus / 1000)
+
+    field_v = field_calc(pixel_vertical, pixel_size, focus / 1000)
+
+    col_resolving_rad = resolving_rad_calc(focus / 1000, pixel_size)
     col_resolving_minutes = resolving_minutes_calc(col_resolving_rad)
 
     st.subheader('Расчитанные данные')
@@ -257,9 +258,9 @@ if __name__ == "__main__":
 
     col_focus2, col_field2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(4)
     with col_focus2:
-        st.markdown('### ' + str(round(focus * 1000, 1)) + ' мм')
+        st.markdown('### ' + str(round(focus, 1)) + ' мм')
     with col_field2:
-        st.markdown('### ' + str(field_h) + '° х ' + str(field_v) + '°')
+        st.markdown('### ' + str(round(field_h, 2)) + '° х ' + str(round(field_v, 2)) + '°')
     with col_resolving_power_lines2:
         st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
     with col_resolving_power_minutes2:
