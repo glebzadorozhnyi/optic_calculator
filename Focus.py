@@ -52,6 +52,10 @@ def pixel_count_calc(focus, target_size, distance, pixel_size):
     st.session_state['threshold_enable'] = 'Свой критерий'
     return threshold_pixel_count
 
+def target_size_calc(focus, threshold_pixel_count, pixel_size, distance):
+    target_size = distance * threshold_pixel_count * pixel_size / focus
+    return target_size
+
 def get_variable_from_session_state(variable_name, default_value=None):
     if variable_name in st.session_state:
         return st.session_state[variable_name]
