@@ -153,9 +153,9 @@ def criteria_block(criterias):
     return threshold_pixel_count
 
 def distance_block():
-    default_distance = int(get_variable_from_session_state('default_distance', 1000))
-    distance = st.number_input('Требуемая дальность [м] (L)', min_value=1, max_value=99999, value=default_distance, step=1)
-    st.session_state['default_distance'] = distance
+    default_distance = get_variable_from_session_state('distance', 1000)
+    st.session_state['distance'] = default_distance
+    distance = st.number_input('Требуемая дальность [м] (L)', min_value=0.1, max_value=99999.0, step=50.0, key='distance')
     return  distance
 
 
