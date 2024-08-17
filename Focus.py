@@ -124,8 +124,9 @@ def draw_head(data):
     st.session_state['previous_pixel_vertical'] = pixel_vertical
     return pixel_horizontal, pixel_vertical, pixel_size
 def target_size_block():
-    default_target_size = get_variable_from_session_state('previous_target_size', 1.6)
-    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, value=default_target_size, step=0.01)
+    default_target_size = get_variable_from_session_state('target_size', 1.6)
+    st.session_state['target_size'] = default_target_size
+    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.01, key='target_size')
     st.session_state['previous_target_size'] = target_size
     return target_size
 def criteria_block(criterias):
