@@ -56,6 +56,12 @@ def target_size_calc(focus, threshold_pixel_count, pixel_size, distance):
     target_size = distance * threshold_pixel_count * pixel_size / focus
     return target_size
 
+def diagonal_matrix_calc(pixel_horizontal, pixel_vertical, pixel_size):
+    diagonal = math.sqrt(pixel_horizontal ** 2 + pixel_vertical ** 2) * pixel_size * 39.3701
+    return diagonal
+
+
+
 def get_variable_from_session_state(variable_name, default_value=None):
     if variable_name in st.session_state:
         return st.session_state[variable_name]
