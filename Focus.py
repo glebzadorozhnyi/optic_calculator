@@ -56,8 +56,8 @@ def target_size_calc(focus, threshold_pixel_count, pixel_size, distance):
     target_size = distance * threshold_pixel_count * pixel_size / focus
     return target_size
 
-def diagonal_matrix_calc(pixel_horizontal, pixel_vertical, pixel_size):
-    diagonal = math.sqrt(pixel_horizontal ** 2 + pixel_vertical ** 2) * pixel_size * 39.3701
+def diagonal_matrix_pixel_calc(pixel_horizontal, pixel_vertical):
+    diagonal = math.sqrt(pixel_horizontal ** 2 + pixel_vertical ** 2)
     return diagonal
 
 
@@ -253,21 +253,25 @@ if __name__ == "__main__":
 
     field_v = field_calc(pixel_vertical, pixel_size, focus / 1000)
 
+    diagonal_pixel = diagonal_matrix_pixel_calc(pixel_horizontal, pixel_vertical)
+
+    field_d = field_calc(diagonal_pixel, pixel_size, focus / 1000)
+
     col_resolving_rad = resolving_rad_calc(focus / 1000, pixel_size)
     col_resolving_minutes = resolving_minutes_calc(col_resolving_rad)
 
     st.subheader('Расчитанные данные')
-    col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns(4)
+    col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns([0.9, 1.1, 1, 1])
     with col_focus:
         st.markdown('Фокусное расстояние (f)')
     with col_field:
-        st.markdown('Угловое поле (w)')
+        st.markdown('Угловое поле ШхВ (w)')
     with col_resolving_power_lines:
         st.markdown('Разрешающая способность')
     with col_resolving_power_minutes:
         st.markdown('Разрешающая способность')
 
-    col_focus2, col_field2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(4)
+    col_focus2, col_field2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns([0.9, 1.1, 1, 1])
     with col_focus2:
         st.markdown('### ' + str(round(focus, 1)) + ' мм')
     with col_field2:
@@ -276,6 +280,14 @@ if __name__ == "__main__":
         st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
     with col_resolving_power_minutes2:
         st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
+
+    _, diag_field, _, _ = st.columns([0.9, 1.1, 1, 1])
+
+    with diag_field:
+        st.markdown('\n')
+        st.markdown('Угловое поле по диагонали')
+        st.markdown('### ' + str(round(field_d, 2)) + '°')
+
 
     st.markdown(':small_blue_diamond: Реальное угловое поле будет отличаться от расчитанного из-за оптических абераций объектива')
     st.markdown(':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
