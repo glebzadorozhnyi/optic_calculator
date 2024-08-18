@@ -51,4 +51,6 @@ with col_resolving_power_lines2:
 with col_resolving_power_minutes2:
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 
-st.markdown(':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
+Focus.resolving_disclaimer()
+
+Focus.pdf_block()

@@ -140,7 +140,7 @@ def draw_head(data):
 def target_size_block():
     default_target_size = get_variable_from_session_state('target_size', 1.6)
     st.session_state['target_size'] = default_target_size
-    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.001, key='target_size')
+    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.01, key='target_size')
     st.session_state['previous_target_size'] = target_size
     return target_size
 def criteria_block(criterias):
@@ -221,13 +221,20 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
                                     disabled=True, key='focus')
     return focus
 
+def pdf_block():
+    st.markdown(
+        ':floppy_disk: Чтобы сохранить страницу в pdf нажмите на меню в правом верхнем углу - Print - Save as PDF. \n Измените формат листа или масштба страницы, если она не поместилась целиком')
 
+def resolving_disclaimer():
+    st.markdown(
+        ':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
 
 if __name__ == "__main__":
     data = read_json('data.json')
     criterias = list(read_json('criteria.json'))
 
     adjust_width_of_page()
+
 
     st.title('Оптический калькулятор')
 
@@ -290,4 +297,6 @@ if __name__ == "__main__":
 
 
     st.markdown(':small_blue_diamond: Реальное угловое поле будет отличаться от расчитанного из-за оптических абераций объектива')
-    st.markdown(':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
+    resolving_disclaimer()
+
+    pdf_block()
