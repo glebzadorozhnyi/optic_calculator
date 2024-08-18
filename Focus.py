@@ -94,18 +94,21 @@ def draw_head(data):
             pixel_vertical = st.number_input('Количество пикселей в матрице по вертикали [шт] (n)', min_value=1,
                                              max_value=10000, step=1, disabled=False, key='pixel_vertical')
         else:
-            previous_matrix_type = st.session_state.pop('previous_matrix_type', 'NO')
+            previous_matrix_type = get_variable_from_session_state('previous_matrix_type', 'NO')
             if previous_matrix_type == matrix_type:
-                previous_matrix = st.session_state.pop('matrix', matrixes[0])
+                default_matrix = st.session_state.pop('matrix', matrixes[0])
+                previous_matrix = st.session_state.pop('previous_matrix')
             else:
-                previous_matrix = matrixes[0]
+                default_matrix = matrixes[0]
+                previous_matrix = 'none'
 
-            st.session_state['matrix'] = previous_matrix
+            st.session_state['matrix'] = default_matrix
 
             matrix = st.selectbox('Выберите матрицу', options=matrixes,
                                   disabled=False, placeholder='Выберите матрицу', key='matrix')
-
             resolutions = list(data[matrix_type][matrix])
+            st.session_state['previous_matrix'] = matrix
+
             if previous_matrix_type == matrix_type and previous_matrix == matrix:
                 default_resolution = st.session_state.pop('resolution', resolutions[0])
             else:
