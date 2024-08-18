@@ -5,6 +5,9 @@ import streamlit as st
 
 Focus.adjust_width_of_page()
 
+Focus.load_session_state()
+Focus.save_session_state()
+
 data = Focus.read_json('data.json')
 criterias = list(Focus.read_json('criteria.json'))
 

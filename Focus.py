@@ -220,6 +220,30 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
                                     max_value=10000.0, step=10.0,
                                     disabled=True, key='focus')
     return focus
+def save_session_state():
+    with st.sidebar:
+        data_to_save = dict()
+        for key, value in st.session_state.items():
+            if key == 'upload_file':
+                continue
+            data_to_save[key] = value
+        st.download_button('Экспорт расчёта', json.dumps(data_to_save), file_name='optic_calculator.json')
+
+def load_session_state():
+    def update_session_state():
+        upload_file = get_variable_from_session_state('upload_file', None)
+        if upload_file is not None:
+            data = json.load(st.session_state['upload_file'])
+            for key, value in data.items():
+                if key == 'upload_file':
+                    continue
+                st.session_state[key] = value
+
+
+    with st.sidebar:
+        st.file_uploader('Импорт расчёта', type='json', on_change=update_session_state, key='upload_file')
+
+
 
 def pdf_block():
     st.markdown(
@@ -229,12 +253,16 @@ def resolving_disclaimer():
     st.markdown(
         ':small_blue_diamond: Реальная разрешающая способность будет всегда ниже расчётной из-за оптических абераций объектива')
 
+
+
 if __name__ == "__main__":
     data = read_json('data.json')
     criterias = list(read_json('criteria.json'))
 
     adjust_width_of_page()
 
+    load_session_state()
+    save_session_state()
 
     st.title('Оптический калькулятор')
 
@@ -300,3 +328,4 @@ if __name__ == "__main__":
     resolving_disclaimer()
 
     pdf_block()
+
