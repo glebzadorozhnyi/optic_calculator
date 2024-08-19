@@ -2,6 +2,7 @@ import streamlit as st
 import math
 import json
 
+
 @st.cache_data
 def adjust_width_of_page():
     css = '''
@@ -10,6 +11,14 @@ def adjust_width_of_page():
     </style>
     '''
     st.markdown(css, unsafe_allow_html=True)
+
+def draw_side_bar():
+    # builds the sidebar menu
+    with st.sidebar:
+        st.page_link('Focus.py', label='Фокус', )
+        st.page_link('pages/1_Distance.py', label='Дальность')
+        st.page_link('pages/2_Pixels.py', label='Пиксели')
+        st.page_link('pages/3_Target_size.py', label='Размер объекта')
 
 
 @st.cache_data
@@ -188,7 +197,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
 
     with col_select:
 
-        focus_or_field_selection = st.radio('Расчёт по', ['Фокус','Угловое поле'], index=0, help='Фокусное расстояние и угловое поле это зависимые друг от друга величины, поэтому задать можно только одну, а вторая будет рассчитана')
+        focus_or_field_selection = st.radio('Расчёт по', ['Фокус','Угол обзора'], index=0, help='Фокусное расстояние и угол обзора это зависимые друг от друга величины, поэтому задать можно только одну, а вторая будет рассчитана')
 
 
     if focus_or_field_selection == 'Фокус':
@@ -199,17 +208,17 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
 
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
                                     max_value=10000.0, step=10.0,
-                                    disabled=focus_or_field_selection == 'Угловое поле', key='focus', help='Чем меньше фокусное расстояние, тем больше угол обзора (и наоборот)')
+                                    disabled=focus_or_field_selection == 'Угол обзора', key='focus', help='Чем меньше фокусное расстояние, тем больше угол обзора (и наоборот)')
 
         st.session_state['field_h'] = field_calc(pixel_horizontal, pixel_size, focus / 1000)
         st.session_state['field_v'] = field_calc(pixel_vertical, pixel_size, focus / 1000)
 
         with col_field:
 
-            st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
+            st.number_input('Угол обзора по горизонтали [°] (w)', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_h', help= "Ввод только в десятичном формате. Снизу отображение в формате [Градусы° Угловые минуты']")
 
-            st.number_input('Угловое поле по вертикали [°]', min_value=0.01,
+            st.number_input('Угол обзора по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
             st.markdown(dd2dms(st.session_state.field_h) + ' х ' + dd2dms(st.session_state.field_v))
     else:
@@ -217,13 +226,13 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
         with col_field:
             default_field_h = get_variable_from_session_state('field_h', 3.0)
             st.session_state['field_h'] = default_field_h
-            st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
+            st.number_input('Угол обзора по горизонтали [°] (w)', min_value=0.01,
                                                max_value=359.0, step=1.0, key='field_h', help= "Ввод только в десятичном формате. Снизу отображение в формате [Градусы° Угловые минуты']")
 
             st.session_state['field_v'] = st.session_state.field_h * pixel_vertical / pixel_horizontal
             st.session_state['focus'] = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
 
-            st.number_input('Угловое поле по вертикали [°]', min_value=0.01,
+            st.number_input('Угол обзора по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
 
             st.markdown(dd2dms(st.session_state.field_h) + ' х ' + dd2dms(st.session_state.field_v))
@@ -274,18 +283,19 @@ def resolving_disclaimer():
 
 
 if __name__ == "__main__":
+    st.set_page_config("Оптический калькулятор")
     data = read_json('data.json')
     criterias = read_json('criteria.json')
-
     adjust_width_of_page()
+    draw_side_bar()
 
     load_session_state_button()
     save_session_state_button()
 
-    st.title('Оптический калькулятор')
+    st.title('Фокусное расстояние и Угол обзора')
 
     st.markdown('''Расчёт фокусного расстояния объектива для заданной матрицы, размера объекта, критерия наблюдения (обнаружение, распознавание) и дальности наблюдения.\n
-Угловое поле расчитывается исходя из получившегося фокусного расстояния и заданой матрицы.''')
+Угол обзора рассчитывается исходя из получившегося фокусного расстояния и заданой матрицы.''')
 
     pixel_horizontal, pixel_vertical, pixel_size = head_and_matrix(data)
 
@@ -316,10 +326,10 @@ if __name__ == "__main__":
         st.markdown('Фокусное расстояние (f)', help='Чем меньше фокусное расстояние, тем больше угол обзора (и наоборот)')
         st.markdown('### ' + str(round(focus, 1)) + ' мм')
     with col_field:
-        st.markdown('Угловое поле ШхВ (w)', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
+        st.markdown('Угол обзора ШхВ (w)', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
         st.markdown('### ' + dd2dms(field_h) + ' х ' + dd2dms(field_v))
     with diag_field:
-        st.markdown('Угловое поле по диагонали')
+        st.markdown('Угол обзора по диагонали')
         st.markdown('### ' + dd2dms(field_d))
     with col_resolving_power_lines:
         st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
@@ -333,7 +343,7 @@ if __name__ == "__main__":
         st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 
 
-    st.markdown(':small_blue_diamond: Реальное угловое поле будет отличаться от расчитанного из-за оптических абераций объектива')
+    st.markdown(':small_blue_diamond: Реальный угол обзора будет отличаться от расчитанного из-за оптических абераций объектива')
     resolving_disclaimer()
 
     pdf_block()

@@ -1,9 +1,9 @@
-import Focus
 import streamlit as st
-
-
+st.set_page_config("Оптический калькулятор")
+import Focus
 
 Focus.adjust_width_of_page()
+Focus.draw_side_bar()
 
 Focus.load_session_state_button()
 Focus.save_session_state_button()
@@ -11,9 +11,9 @@ Focus.save_session_state_button()
 data = Focus.read_json('data.json')
 criterias = Focus.read_json('criteria.json')
 
-st.title('Оптический калькулятор')
+st.title('Дальность')
 
-st.markdown('Расчёт предельной дистанции наблюдения объекта для заданной матрицы, размера цели, критерия наблюдения (обнаружение, распознавание) и фокуса (или углового поля) объектива.')
+st.markdown('Расчёт предельной дальности наблюдения объекта для заданной матрицы, размера цели, критерия наблюдения (обнаружение, распознавание) и фокуса (или углового поля) объектива.')
 
 pixel_horizontal, pixel_vertical, pixel_size = Focus.head_and_matrix(data)
 pixel_size = pixel_size / 1000000
