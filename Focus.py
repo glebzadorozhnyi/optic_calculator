@@ -124,7 +124,7 @@ def head_and_matrix(data):
             default_pixel_size = get_variable_from_session_state('pixel_size', 3.45)
             st.session_state['pixel_size'] = default_pixel_size
             pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0,
-                                         step=0.01, disabled=False, key='pixel_size')
+                                         step=0.01, disabled=False, key='pixel_size', help= 'Пиксель – мельчайшая часть исходного изображения. Теоретически большее количество мегапикселей позволяет получить более высокое качество видео. На практике имеет значение не только число пикселей, но и их размер.')
         else:
             pixel_horizontal = int(resolution.split()[0])
             pixel_vertical = int(resolution.split()[2])
@@ -134,7 +134,7 @@ def head_and_matrix(data):
             st.session_state['pixel_vertical'] = pixel_vertical
 
             st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, step=0.01,
-                            disabled=True, key='pixel_size')
+                            disabled=True, key='pixel_size', help='Пиксель – мельчайшая часть исходного изображения. Теоретически большее количество мегапикселей позволяет получить более высокое качество видео. На практике имеет значение не только число пикселей, но и их размер.')
     st.session_state['previous_matrix_type'] = matrix_type
     return pixel_horizontal, pixel_vertical, pixel_size
 def target_size_block():
@@ -149,8 +149,8 @@ def criteria_block(criterias):
     with col_criteria:
         default_criteria = get_variable_from_session_state('threshold_enable', options[0])
         st.session_state['threshold_enable'] = default_criteria
-        criteria = st.selectbox('Выберите критерий', options=options, placeholder='Выберите матрицу',
-                                key='threshold_enable')
+        criteria = st.selectbox('Выберите критерий', options=options,
+                                key='threshold_enable', help='Критерий Джонсона - это наиболее часто употребляемый критерий для расчета дальности действия оптико-электронных приборов')
 
     with col_threshold:
         if criteria == options[-1]:
@@ -190,7 +190,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
 
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
                                     max_value=10000.0, step=10.0,
-                                    disabled=focus_or_field_selection == 'Угловое поле', key='focus')
+                                    disabled=focus_or_field_selection == 'Угловое поле', key='focus', help='Чем меньше фокусное расстояние, тем больше угол обзора (и наоборот)')
 
         st.session_state['field_h'] = field_calc(pixel_horizontal, pixel_size, focus / 1000)
         st.session_state['field_v'] = field_calc(pixel_vertical, pixel_size, focus / 1000)
@@ -198,7 +198,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
         with col_field:
 
             st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
-                                               max_value=359.0, step=0.01, disabled=True, key='field_h')
+                                               max_value=359.0, step=0.01, disabled=True, key='field_h', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
 
             st.number_input('Угловое поле по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
@@ -208,7 +208,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
             default_field_h = get_variable_from_session_state('field_h', 3.0)
             st.session_state['field_h'] = default_field_h
             st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
-                                               max_value=359.0, step=1.0, key='field_h')
+                                               max_value=359.0, step=1.0, key='field_h', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
 
             st.session_state['field_v'] = st.session_state.field_h * pixel_vertical / pixel_horizontal
             st.session_state['focus'] = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
@@ -300,9 +300,9 @@ if __name__ == "__main__":
     st.subheader('Расчитанные данные')
     col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns([0.9, 1.1, 1, 1])
     with col_focus:
-        st.markdown('Фокусное расстояние (f)')
+        st.markdown('Фокусное расстояние (f)', help='Чем меньше фокусное расстояние, тем больше угол обзора (и наоборот)')
     with col_field:
-        st.markdown('Угловое поле ШхВ (w)')
+        st.markdown('Угловое поле ШхВ (w)', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
     with col_resolving_power_lines:
         st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
     with col_resolving_power_minutes:
