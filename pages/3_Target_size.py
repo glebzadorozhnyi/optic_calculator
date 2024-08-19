@@ -9,13 +9,13 @@ Focus.load_session_state()
 Focus.save_session_state()
 
 data = Focus.read_json('data.json')
-criterias = list(Focus.read_json('criteria.json'))
+criterias = Focus.read_json('criteria.json')
 
 st.title('Оптический калькулятор')
 
 st.markdown('Расчёт размера объекта, для которого будет выполнен критерий наблюдения при заданной матрице, дальности до цели и фокуса (или углового поля) объектива.')
 
-pixel_horizontal, pixel_vertical, pixel_size = Focus.draw_head(data)
+pixel_horizontal, pixel_vertical, pixel_size = Focus.head_and_matrix(data)
 pixel_size = pixel_size / 1000000
 
 threshold_pixel_count = Focus.criteria_block(criterias)

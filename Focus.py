@@ -68,23 +68,23 @@ def get_variable_from_session_state(variable_name, default_value=None):
     else:
         return default_value
 
-def draw_head(data):
+def head_and_matrix(data):
     st.image('shema.jpg', )
 
     st.subheader('Входные данные')
 
-    col_matrix_type, col_select_tool, col_data = st.columns([1, 1.9, 1.2])
+    col_matrix_type, col_matrix_and_resolution, col_pixel_size = st.columns([1, 1.9, 1.2])
 
     matrix_types = list(data)
 
     with col_matrix_type:
-        default_matrix_type = get_variable_from_session_state('matrix_type', 'ТВ')
+        default_matrix_type = get_variable_from_session_state('matrix_type', matrix_types[0])
         st.session_state['matrix_type'] = default_matrix_type
         matrix_type = st.radio('Выберите тип матрицы', matrix_types, key='matrix_type')
 
-    with col_select_tool:
+    with col_matrix_and_resolution:
         matrixes = list(data[matrix_type])
-        if matrix_type == 'Своя':
+        if matrix_type == matrix_types[-1]:
             default_pixel_horizontal = get_variable_from_session_state('pixel_horizontal', 1920)
             default_pixel_vertical = get_variable_from_session_state('pixel_vertical', 1080)
             st.session_state['pixel_horizontal'] = default_pixel_horizontal
@@ -96,7 +96,7 @@ def draw_head(data):
         else:
             previous_matrix_type = get_variable_from_session_state('previous_matrix_type', 'NO')
             if previous_matrix_type == matrix_type:
-                default_matrix = st.session_state.pop('matrix', matrixes[0])
+                default_matrix = get_variable_from_session_state('matrix', matrixes[0])
                 previous_matrix = st.session_state.pop('previous_matrix')
             else:
                 default_matrix = matrixes[0]
@@ -119,8 +119,13 @@ def draw_head(data):
             resolution = st.selectbox('Выберите разрешение', options=resolutions,
                                       disabled=len(resolutions) == 1, key = 'resolution')
 
-    with col_data:
-        if matrix_type != 'Своя':
+    with col_pixel_size:
+        if matrix_type == matrix_types[-1]:
+            default_pixel_size = get_variable_from_session_state('pixel_size', 3.45)
+            st.session_state['pixel_size'] = default_pixel_size
+            pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0,
+                                         step=0.01, disabled=False, key='pixel_size')
+        else:
             pixel_horizontal = int(resolution.split()[0])
             pixel_vertical = int(resolution.split()[2])
             pixel_size = float(list(data[matrix_type][matrix][resolution])[0])
@@ -130,11 +135,6 @@ def draw_head(data):
 
             st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0, step=0.01,
                             disabled=True, key='pixel_size')
-        else:
-            default_pixel_size = get_variable_from_session_state('pixel_size', 3.45)
-            st.session_state['pixel_size'] = default_pixel_size
-            pixel_size = st.number_input('Размер пиксела [мкм] (ax)', min_value=0.01, max_value=100.0,
-                                         step=0.01, disabled=False, key='pixel_size')
     st.session_state['previous_matrix_type'] = matrix_type
     return pixel_horizontal, pixel_vertical, pixel_size
 def target_size_block():
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     st.markdown('''Расчёт фокусного расстояния объектива для заданной матрицы, размера объекта, критерия наблюдения (обнаружение, распознавание) и дальности наблюдения.\n
 Угловое поле расчитывается исходя из получившегося фокусного расстояния и заданой матрицы.''')
 
-    pixel_horizontal, pixel_vertical, pixel_size = draw_head(data)
+    pixel_horizontal, pixel_vertical, pixel_size = head_and_matrix(data)
 
     target_size = target_size_block()
 
