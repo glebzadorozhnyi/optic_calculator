@@ -330,7 +330,7 @@ if __name__ == "__main__":
     with diag_field2:
         st.markdown('### ' + dd2dms(field_d))
     with col_resolving_power_lines2:
-        st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
+        st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
 
     _, _, _, col_resolving_power_minutes = st.columns([0.9, 1.1, 1, 1])
 

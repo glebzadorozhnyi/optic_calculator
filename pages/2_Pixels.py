@@ -46,7 +46,7 @@ col_pixels2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.colum
 with col_pixels2:
     st.markdown('### ' + str(round(threshold_pixel_count,2)) + ' пикс')
 with col_resolving_power_lines2:
-    st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
+    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
 with col_resolving_power_minutes2:
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 

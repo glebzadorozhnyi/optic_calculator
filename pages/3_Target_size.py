@@ -51,7 +51,7 @@ with col_pixels2:
     else:
         st.markdown('### ' + str(round(target_size, 2)) + ' м')
 with col_resolving_power_lines2:
-    st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
+    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
 with col_resolving_power_minutes2:
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 

@@ -50,7 +50,7 @@ with col_distance2:
     st.markdown('### ' + str(round(distance, 1)) + ' м')
 
 with col_resolving_power_lines2:
-    st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
+    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
 with col_resolving_power_minutes2:
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 
