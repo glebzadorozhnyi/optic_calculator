@@ -60,6 +60,15 @@ def diagonal_matrix_pixel_calc(pixel_horizontal, pixel_vertical):
     diagonal = math.sqrt(pixel_horizontal ** 2 + pixel_vertical ** 2)
     return diagonal
 
+def dd2dms(decimaldegree):
+    if type(decimaldegree) != 'float':
+        try:
+            decimaldegree = float(decimaldegree)
+        except:
+            return 0
+    minutes = decimaldegree % 1.0 * 60
+
+    return '{0}°{1}\''.format(int(math.floor(decimaldegree)), int(math.floor(minutes)))
 
 
 def get_variable_from_session_state(variable_name, default_value=None):
@@ -198,23 +207,27 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
         with col_field:
 
             st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
-                                               max_value=359.0, step=0.01, disabled=True, key='field_h', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
+                                               max_value=359.0, step=0.01, disabled=True, key='field_h', help= "Ввод только в десятичном формате. Снизу отображение в формате [Градусы° Угловые минуты']")
 
             st.number_input('Угловое поле по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
+            st.markdown(dd2dms(st.session_state.field_h) + ' х ' + dd2dms(st.session_state.field_v))
     else:
 
         with col_field:
             default_field_h = get_variable_from_session_state('field_h', 3.0)
             st.session_state['field_h'] = default_field_h
             st.number_input('Угловое поле по горизонтали [°] (w)', min_value=0.01,
-                                               max_value=359.0, step=1.0, key='field_h', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
+                                               max_value=359.0, step=1.0, key='field_h', help= "Ввод только в десятичном формате. Снизу отображение в формате [Градусы° Угловые минуты']")
 
             st.session_state['field_v'] = st.session_state.field_h * pixel_vertical / pixel_horizontal
             st.session_state['focus'] = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
 
             st.number_input('Угловое поле по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
+
+            st.markdown(dd2dms(st.session_state.field_h) + ' х ' + dd2dms(st.session_state.field_v))
+
         with col_focus:
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
                                     max_value=10000.0, step=10.0,
@@ -298,32 +311,32 @@ if __name__ == "__main__":
     col_resolving_minutes = resolving_minutes_calc(col_resolving_rad)
 
     st.subheader('Расчитанные данные')
-    col_focus, col_field, col_resolving_power_lines, col_resolving_power_minutes = st.columns([0.9, 1.1, 1, 1])
+    col_focus, col_field, diag_field, col_resolving_power_lines  = st.columns([0.9, 1.1, 1, 1])
     with col_focus:
         st.markdown('Фокусное расстояние (f)', help='Чем меньше фокусное расстояние, тем больше угол обзора (и наоборот)')
     with col_field:
         st.markdown('Угловое поле ШхВ (w)', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
+    with diag_field:
+        st.markdown('Угловое поле по диагонали')
     with col_resolving_power_lines:
         st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-    with col_resolving_power_minutes:
-        st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
 
-    col_focus2, col_field2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns([0.9, 1.1, 1, 1])
+
+    col_focus2, col_field2, diag_field2, col_resolving_power_lines2 = st.columns([0.9, 1.1, 1, 1])
     with col_focus2:
         st.markdown('### ' + str(round(focus, 1)) + ' мм')
     with col_field2:
-        st.markdown('### ' + str(round(field_h, 2)) + '° х ' + str(round(field_v, 2)) + '°')
+        st.markdown('### ' + dd2dms(field_h) + ' х ' + dd2dms(field_v))
+    with diag_field2:
+        st.markdown('### ' + dd2dms(field_d))
     with col_resolving_power_lines2:
         st.markdown('### ' + str(round(col_resolving_rad, 2)) + ' мрад⁻¹')
-    with col_resolving_power_minutes2:
+
+    _, _, _, col_resolving_power_minutes = st.columns([0.9, 1.1, 1, 1])
+
+    with col_resolving_power_minutes:
+        st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
         st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
-
-    _, diag_field, _, _ = st.columns([0.9, 1.1, 1, 1])
-
-    with diag_field:
-        st.markdown('\n')
-        st.markdown('Угловое поле по диагонали')
-        st.markdown('### ' + str(round(field_d, 2)) + '°')
 
 
     st.markdown(':small_blue_diamond: Реальное угловое поле будет отличаться от расчитанного из-за оптических абераций объектива')
