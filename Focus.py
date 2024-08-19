@@ -158,7 +158,7 @@ def head_and_matrix(data):
 def target_size_block():
     default_target_size = get_variable_from_session_state('target_size', 1.6)
     st.session_state['target_size'] = default_target_size
-    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.01, key='target_size', help='Характерный размер объекта. Выбирают либо минимальный из наблюдаемых габаритов min(Ш, В), либо средний (Ш + В)*0,5')
+    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.1, key='target_size', help='Характерный размер объекта. Выбирают либо минимальный из наблюдаемых габаритов min(Ш, В), либо средний (Ш + В)*0,5')
     st.session_state['previous_target_size'] = target_size
     return target_size
 def criteria_block(criterias):
