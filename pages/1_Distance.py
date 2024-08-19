@@ -38,21 +38,17 @@ col_distance, col_resolving_power_lines, col_resolving_power_minutes = st.column
 
 
 with col_distance:
-    st.markdown('Дальность наблюдения (L) согласно выбранному критерию')
+    st.markdown('Дальность наблюдения (L)', help='Дальность наблюдения согласно выбранному критерию')
+    st.markdown('### ' + str(round(distance, 1)) + ' м')
 
 with col_resolving_power_lines:
     st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
+    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
 with col_resolving_power_minutes:
     st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-
-col_distance2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(3)
-with col_distance2:
-    st.markdown('### ' + str(round(distance, 1)) + ' м')
-
-with col_resolving_power_lines2:
-    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
-with col_resolving_power_minutes2:
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
+
+
 
 Focus.resolving_disclaimer()
 Focus.pdf_block()

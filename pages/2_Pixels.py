@@ -35,20 +35,16 @@ threshold_pixel_count = Focus.pixel_count_calc(focus / 1000, target_size, distan
 
 
 with col_pixels:
-    st.markdown('Количество пикселей, которые занимает цель на матрице')
+    st.markdown('Количество пикселей', help='Количество пикселей, которые занимает цель на матрице')
+    st.markdown('### ' + str(round(threshold_pixel_count, 2)) + ' пикс')
 
 with col_resolving_power_lines:
     st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
+    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
 with col_resolving_power_minutes:
     st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-
-col_pixels2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(3)
-with col_pixels2:
-    st.markdown('### ' + str(round(threshold_pixel_count,2)) + ' пикс')
-with col_resolving_power_lines2:
-    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
-with col_resolving_power_minutes2:
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
+
 
 Focus.resolving_disclaimer()
 Focus.pdf_block()

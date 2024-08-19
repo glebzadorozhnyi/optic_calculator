@@ -37,22 +37,17 @@ col_pixels, col_resolving_power_lines, col_resolving_power_minutes = st.columns(
 
 
 with col_pixels:
-    st.markdown('Размер цели для которой будет выполнен критерий наблюдения')
-
-with col_resolving_power_lines:
-    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-with col_resolving_power_minutes:
-    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-
-col_pixels2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(3)
-with col_pixels2:
+    st.markdown('Размер цели', help='Размер цели для которой будет выполнен критерий наблюдения')
     if target_size < 1:
         st.markdown('### ' + str(round(target_size*100, 2)) + ' см')
     else:
         st.markdown('### ' + str(round(target_size, 2)) + ' м')
-with col_resolving_power_lines2:
+
+with col_resolving_power_lines:
+    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
     st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
-with col_resolving_power_minutes2:
+with col_resolving_power_minutes:
+    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 
 Focus.resolving_disclaimer()

@@ -314,23 +314,17 @@ if __name__ == "__main__":
     col_focus, col_field, diag_field, col_resolving_power_lines  = st.columns([0.9, 1.1, 1, 1])
     with col_focus:
         st.markdown('Фокусное расстояние (f)', help='Чем меньше фокусное расстояние, тем больше угол обзора (и наоборот)')
+        st.markdown('### ' + str(round(focus, 1)) + ' мм')
     with col_field:
         st.markdown('Угловое поле ШхВ (w)', help= 'Чем шире угол обзора - тем большее пространство захватывает камера и в то же время мельче получаются изображения отдельных предметов в кадре')
+        st.markdown('### ' + dd2dms(field_h) + ' х ' + dd2dms(field_v))
     with diag_field:
         st.markdown('Угловое поле по диагонали')
+        st.markdown('### ' + dd2dms(field_d))
     with col_resolving_power_lines:
         st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-
-
-    col_focus2, col_field2, diag_field2, col_resolving_power_lines2 = st.columns([0.9, 1.1, 1, 1])
-    with col_focus2:
-        st.markdown('### ' + str(round(focus, 1)) + ' мм')
-    with col_field2:
-        st.markdown('### ' + dd2dms(field_h) + ' х ' + dd2dms(field_v))
-    with diag_field2:
-        st.markdown('### ' + dd2dms(field_d))
-    with col_resolving_power_lines2:
         st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
+
 
     _, _, _, col_resolving_power_minutes = st.columns([0.9, 1.1, 1, 1])
 
