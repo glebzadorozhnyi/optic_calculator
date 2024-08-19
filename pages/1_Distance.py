@@ -5,8 +5,8 @@ import streamlit as st
 
 Focus.adjust_width_of_page()
 
-Focus.load_session_state()
-Focus.save_session_state()
+Focus.load_session_state_button()
+Focus.save_session_state_button()
 
 data = Focus.read_json('data.json')
 criterias = Focus.read_json('criteria.json')
@@ -55,5 +55,4 @@ with col_resolving_power_minutes2:
     st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
 
 Focus.resolving_disclaimer()
-
 Focus.pdf_block()

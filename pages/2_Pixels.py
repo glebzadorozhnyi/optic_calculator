@@ -5,8 +5,8 @@ import streamlit as st
 
 Focus.adjust_width_of_page()
 
-Focus.load_session_state()
-Focus.save_session_state()
+Focus.load_session_state_button()
+Focus.save_session_state_button()
 
 data = Focus.read_json('data.json')
 criterias = Focus.read_json('criteria.json')
@@ -31,7 +31,7 @@ st.subheader('Расчитанные данные')
 
 col_pixels, col_resolving_power_lines, col_resolving_power_minutes = st.columns(3)
 
-threshold_pixel_count = Focus.pixel_count_calc(focus / 1000, target_size, distance, pixel_size)
+threshold_pixel_count = Focus.pixel_count_calc(focus / 1000, target_size, distance, pixel_size, list(criterias)[-1])
 
 
 with col_pixels:

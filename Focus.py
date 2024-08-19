@@ -45,11 +45,11 @@ def distance_calc(focus, threshold_pixel_count, pixel_size, target_size):
     distance = (focus * target_size) / (pixel_size * threshold_pixel_count)
     return distance
 
-def pixel_count_calc(focus, target_size, distance, pixel_size):
+def pixel_count_calc(focus, target_size, distance, pixel_size, custom_criteria):
     threshold_pixel_count = (focus * target_size) / (distance * pixel_size)
     threshold_pixel_count = threshold_pixel_count
     st.session_state['threshold_pixel_count'] = threshold_pixel_count
-    st.session_state['threshold_enable'] = 'Свой критерий'
+    st.session_state['threshold_enable'] = custom_criteria
     return threshold_pixel_count
 
 def target_size_calc(focus, threshold_pixel_count, pixel_size, distance):
@@ -220,7 +220,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
                                     max_value=10000.0, step=10.0,
                                     disabled=True, key='focus')
     return focus
-def save_session_state():
+def save_session_state_button():
     with st.sidebar:
         data_to_save = dict()
         for key, value in st.session_state.items():
@@ -229,7 +229,7 @@ def save_session_state():
             data_to_save[key] = value
         st.download_button('Экспорт расчёта', json.dumps(data_to_save), file_name='optic_calculator.json')
 
-def load_session_state():
+def load_session_state_button():
     def update_session_state():
         upload_file = get_variable_from_session_state('upload_file', None)
         if upload_file is not None:
@@ -245,13 +245,14 @@ def load_session_state():
 
 
     with st.sidebar:
-        st.file_uploader('Импорт расчёта', type='json', on_change=update_session_state, key='upload_file')
+        st.file_uploader('Импорт расчёта', type='json', on_change=update_session_state, key='upload_file',)
 
 
 
 def pdf_block():
-    st.markdown(
-        ':floppy_disk: Чтобы сохранить страницу в pdf нажмите на меню в правом верхнем углу - Print - Save as PDF. \n Измените формат листа или масштба страницы, если она не поместилась целиком')
+    with st.sidebar:
+        st.markdown('''Чтобы сохранить страницу в pdf нажмите на меню в правом верхнем углу - Print - Save as PDF. \n 
+Измените формат листа или масштба страницы, если она не поместилась целиком''')
 
 def resolving_disclaimer():
     st.markdown(
@@ -265,8 +266,8 @@ if __name__ == "__main__":
 
     adjust_width_of_page()
 
-    load_session_state()
-    save_session_state()
+    load_session_state_button()
+    save_session_state_button()
 
     st.title('Оптический калькулятор')
 
@@ -281,15 +282,12 @@ if __name__ == "__main__":
 
     distance = distance_block()
 
-
     pixel_size = pixel_size / 1000000
 
     focus = focus_calc(pixel_size, threshold_pixel_count, distance, target_size) * 1000
-
     st.session_state['focus'] = focus
 
     field_h = field_calc(pixel_horizontal, pixel_size, focus / 1000)
-
     field_v = field_calc(pixel_vertical, pixel_size, focus / 1000)
 
     diagonal_pixel = diagonal_matrix_pixel_calc(pixel_horizontal, pixel_vertical)
