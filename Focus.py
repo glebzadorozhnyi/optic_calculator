@@ -162,7 +162,7 @@ def criteria_block(criterias):
 
         threshold_pixel_count = st.number_input('Сколько пикселей должна занимать цель на матрице [шт]', min_value=0.1,
                                                 max_value=10000.0, step=1.0,
-                                                disabled=st.session_state.threshold_enable != 'Свой критерий',
+                                                disabled=st.session_state.threshold_enable != options[-1],
                                                 key='threshold_pixel_count')
     return threshold_pixel_count
 
@@ -233,11 +233,15 @@ def load_session_state():
     def update_session_state():
         upload_file = get_variable_from_session_state('upload_file', None)
         if upload_file is not None:
-            data = json.load(st.session_state['upload_file'])
-            for key, value in data.items():
-                if key == 'upload_file':
-                    continue
-                st.session_state[key] = value
+            try:
+                data = json.load(st.session_state['upload_file'])
+                for key, value in data.items():
+                    if key == 'upload_file':
+                        continue
+                    st.session_state[key] = value
+            except:
+                with st.sidebar:
+                    st.warning('Не удалось считать файл')
 
 
     with st.sidebar:
