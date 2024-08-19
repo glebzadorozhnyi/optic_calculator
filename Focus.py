@@ -145,18 +145,18 @@ def target_size_block():
     return target_size
 def criteria_block(criterias):
     col_criteria, col_threshold = st.columns(2)
-
+    options = list(criterias)
     with col_criteria:
-        default_criteria = get_variable_from_session_state('threshold_enable', 'Обнаружение 2')
+        default_criteria = get_variable_from_session_state('threshold_enable', options[0])
         st.session_state['threshold_enable'] = default_criteria
-        criteria = st.selectbox('Выберите критерий', options=criterias, placeholder='Выберите матрицу',
+        criteria = st.selectbox('Выберите критерий', options=options, placeholder='Выберите матрицу',
                                 key='threshold_enable')
 
     with col_threshold:
-        if criteria == 'Свой критерий':
+        if criteria == options[-1]:
             default_threshold_pixel_count = get_variable_from_session_state('threshold_pixel_count', 18)
         else:
-            default_threshold_pixel_count = float(criteria.split()[1])
+            default_threshold_pixel_count = float(criterias[criteria])
 
         st.session_state['threshold_pixel_count'] = default_threshold_pixel_count
 
@@ -257,7 +257,7 @@ def resolving_disclaimer():
 
 if __name__ == "__main__":
     data = read_json('data.json')
-    criterias = list(read_json('criteria.json'))
+    criterias = read_json('criteria.json')
 
     adjust_width_of_page()
 
