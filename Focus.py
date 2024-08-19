@@ -6,7 +6,7 @@ import json
 def adjust_width_of_page():
     css = '''
     <style>
-        section.main > div {max-width:55rem}
+        section.main > div {max-width:60rem}
     </style>
     '''
     st.markdown(css, unsafe_allow_html=True)
@@ -140,7 +140,7 @@ def head_and_matrix(data):
 def target_size_block():
     default_target_size = get_variable_from_session_state('target_size', 1.6)
     st.session_state['target_size'] = default_target_size
-    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.01, key='target_size')
+    target_size = st.number_input('Размер цели [м] (h)', min_value=0.01, max_value=1000.0, step=0.01, key='target_size', help='Характерный размер объекта. Выбирают либо минимальный из наблюдаемых габаритов min(Ш, В), либо средний (Ш + В)*0,5')
     st.session_state['previous_target_size'] = target_size
     return target_size
 def criteria_block(criterias):
@@ -179,7 +179,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
 
     with col_select:
 
-        focus_or_field_selection = st.radio('Расчёт по', ['Фокус','Угловое поле'], index=0)
+        focus_or_field_selection = st.radio('Расчёт по', ['Фокус','Угловое поле'], index=0, help='Фокусное расстояние и угловое поле это зависимые друг от друга величины, поэтому задать можно только одну, а вторая будет рассчитана')
 
 
     if focus_or_field_selection == 'Фокус':
@@ -304,9 +304,9 @@ if __name__ == "__main__":
     with col_field:
         st.markdown('Угловое поле ШхВ (w)')
     with col_resolving_power_lines:
-        st.markdown('Разрешающая способность')
+        st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
     with col_resolving_power_minutes:
-        st.markdown('Разрешающая способность')
+        st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
 
     col_focus2, col_field2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns([0.9, 1.1, 1, 1])
     with col_focus2:

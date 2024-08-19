@@ -41,9 +41,9 @@ with col_distance:
     st.markdown('Дальность наблюдения (L) согласно выбранному критерию')
 
 with col_resolving_power_lines:
-    st.markdown('Разрешающая способность')
+    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
 with col_resolving_power_minutes:
-    st.markdown('Разрешающая способность')
+    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
 
 col_distance2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(3)
 with col_distance2:

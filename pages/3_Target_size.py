@@ -40,9 +40,9 @@ with col_pixels:
     st.markdown('Размер цели для которой будет выполнен критерий наблюдения')
 
 with col_resolving_power_lines:
-    st.markdown('Разрешающая способность')
+    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
 with col_resolving_power_minutes:
-    st.markdown('Разрешающая способность')
+    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
 
 col_pixels2, col_resolving_power_lines2, col_resolving_power_minutes2 = st.columns(3)
 with col_pixels2:
