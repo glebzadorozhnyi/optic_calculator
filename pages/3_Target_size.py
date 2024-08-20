@@ -28,12 +28,12 @@ target_size = Focus.target_size_calc(focus/1000, threshold_pixel_count, pixel_si
 
 st.session_state['target_size'] = target_size
 
-col_resolving_rad = Focus.resolving_rad_calc(focus / 1000, pixel_size)
-col_resolving_minutes = Focus.resolving_minutes_calc(col_resolving_rad)
+resolving_rad = Focus.resolving_rad_calc(focus / 1000, pixel_size)
+degree_resolving = Focus.degree_resolution_calc(pixel_size, focus / 1000)
 
 st.subheader('Расчитанные данные')
 
-col_pixels, col_resolving_power_lines, col_resolving_power_minutes = st.columns(3)
+col_pixels, col_resolving_power_lines, col_degree_resolving = st.columns(3)
 
 
 with col_pixels:
@@ -43,12 +43,8 @@ with col_pixels:
     else:
         st.markdown('### ' + str(round(target_size, 2)) + ' м')
 
-with col_resolving_power_lines:
-    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
-with col_resolving_power_minutes:
-    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-    st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
+Focus.resolving_power_block(col_resolving_power_lines, resolving_rad)
+Focus.degree_resolution_block(col_degree_resolving, degree_resolving)
 
 Focus.resolving_disclaimer()
 Focus.pdf_block()

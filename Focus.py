@@ -47,8 +47,8 @@ def field_calc(pixel_count, pixel_size, focus):
 def resolving_rad_calc(focus, pixel_size):
     return focus / (2 * pixel_size)
 
-def resolving_minutes_calc(col_resolving_rad):
-    return col_resolving_rad * math.pi / (180*60)
+def degree_resolution_calc(pixel_size, focus):
+    return math.degrees(math.atan(pixel_size / focus) * 2 * 3600)
 
 def distance_calc(focus, threshold_pixel_count, pixel_size, target_size):
     distance = (focus * target_size) / (pixel_size * threshold_pixel_count)
@@ -242,6 +242,20 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
                                     max_value=10000.0, step=10.0,
                                     disabled=True, key='focus')
     return focus
+
+def resolving_power_block(column, resolving_power):
+    with column:
+        st.markdown('Разрешающая способность',
+                    help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
+        st.markdown('### ' + str(round(resolving_power)) + ' рад⁻¹')
+
+def degree_resolution_block(column, degree_resolution):
+    with column:
+        st.markdown('Угловое разрешение', help='[угловые секунды] Минимальный угол между объектами, который может различить оптическая система')
+        st.markdown('### ' + str(round(degree_resolution, 2)) + '"')
+
+
+
 def save_session_state_button():
     with st.sidebar:
         data_to_save = dict()
@@ -317,8 +331,8 @@ if __name__ == "__main__":
 
     field_d = field_calc(diagonal_pixel, pixel_size, focus / 1000)
 
-    col_resolving_rad = resolving_rad_calc(focus / 1000, pixel_size)
-    col_resolving_minutes = resolving_minutes_calc(col_resolving_rad)
+    resolving_rad = resolving_rad_calc(focus / 1000, pixel_size)
+    degree_resolving = degree_resolution_calc(pixel_size, focus / 1000)
 
     st.subheader('Расчитанные данные')
     col_focus, col_field, diag_field, col_resolving_power_lines  = st.columns([0.9, 1.1, 1, 1])
@@ -331,16 +345,12 @@ if __name__ == "__main__":
     with diag_field:
         st.markdown('Угол обзора по диагонали')
         st.markdown('### ' + dd2dms(field_d))
-    with col_resolving_power_lines:
-        st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-        st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
+    resolving_power_block(col_resolving_power_lines, resolving_rad)
 
 
-    _, _, _, col_resolving_power_minutes = st.columns([0.9, 1.1, 1, 1])
+    _, _, _, col_degree_resolving = st.columns([0.9, 1.1, 1, 1])
 
-    with col_resolving_power_minutes:
-        st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-        st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
+    degree_resolution_block(col_degree_resolving, degree_resolving)
 
 
     st.markdown(':small_blue_diamond: Реальный угол обзора будет отличаться от расчитанного из-за оптических абераций объектива')

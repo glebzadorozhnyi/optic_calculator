@@ -29,24 +29,20 @@ distance = Focus.distance_calc(focus / 1000, threshold_pixel_count, pixel_size, 
 
 st.session_state['distance'] = distance
 
-col_resolving_rad = Focus.resolving_rad_calc(focus / 1000, pixel_size)
-col_resolving_minutes = Focus.resolving_minutes_calc(col_resolving_rad)
+resolving_rad = Focus.resolving_rad_calc(focus / 1000, pixel_size)
+degree_resolving = Focus.degree_resolution_calc(pixel_size, focus / 1000)
 
 st.subheader('Расчитанные данные')
 
-col_distance, col_resolving_power_lines, col_resolving_power_minutes = st.columns(3)
+col_distance, col_resolving_power_lines, col_degree_resolving = st.columns(3)
 
 
 with col_distance:
     st.markdown('Дальность наблюдения (L)', help='Дальность наблюдения согласно выбранному критерию')
     st.markdown('### ' + str(round(distance, 1)) + ' м')
 
-with col_resolving_power_lines:
-    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-    st.markdown('### ' + str(round(col_resolving_rad)) + ' мрад⁻¹')
-with col_resolving_power_minutes:
-    st.markdown('Разрешающая способность', help='Эта величина нужна для правильного выбора оптической миры, необходимой для проверки качества сборки канала')
-    st.markdown('### ' + str(round(col_resolving_minutes, 2)) + ' мин⁻¹')
+Focus.resolving_power_block(col_resolving_power_lines, resolving_rad)
+Focus.degree_resolution_block(col_degree_resolving, degree_resolving)
 
 
 
