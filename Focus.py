@@ -12,13 +12,13 @@ def adjust_width_of_page():
     '''
     st.markdown(css, unsafe_allow_html=True)
 
-def draw_side_bar():
-    # builds the sidebar menu
+def draw_side_bar(page_1=False, page_2=False, page_3=False, page_4=False):
     with st.sidebar:
-        st.page_link('Focus.py', label='Фокус', )
-        st.page_link('pages/1_Distance.py', label='Дальность')
-        st.page_link('pages/2_Pixels.py', label='Пиксели')
-        st.page_link('pages/3_Target_size.py', label='Размер объекта')
+        icon = ':material/calculate:'
+        st.page_link('Focus.py', label='Фокус', icon=icon if page_1 else None)
+        st.page_link('pages/1_Distance.py', label='Дальность', icon=icon if page_2 else None)
+        st.page_link('pages/2_Pixels.py', label='Пиксели', icon=icon if page_3 else None)
+        st.page_link('pages/3_Target_size.py', label='Размер объекта', icon=icon if page_4 else None)
 
 
 @st.cache_data
@@ -301,10 +301,8 @@ if __name__ == "__main__":
     data = read_json('data.json')
     criterias = read_json('criteria.json')
     adjust_width_of_page()
-    draw_side_bar()
+    draw_side_bar(page_1=True)
 
-    load_session_state_button()
-    save_session_state_button()
 
     st.title('Фокусное расстояние и Угол обзора')
 
@@ -356,5 +354,9 @@ if __name__ == "__main__":
     st.markdown(':small_blue_diamond: Реальный угол обзора будет отличаться от расчитанного из-за оптических абераций объектива')
     resolving_disclaimer()
 
+    load_session_state_button()
+    save_session_state_button()
     pdf_block()
+
+
 

@@ -3,10 +3,7 @@ st.set_page_config("Оптический калькулятор")
 import Focus
 
 Focus.adjust_width_of_page()
-Focus.draw_side_bar()
-
-Focus.load_session_state_button()
-Focus.save_session_state_button()
+Focus.draw_side_bar(page_2=True)
 
 data = Focus.read_json('data.json')
 criterias = Focus.read_json('criteria.json')
@@ -47,4 +44,8 @@ Focus.degree_resolution_block(col_degree_resolving, degree_resolving)
 
 
 Focus.resolving_disclaimer()
+
+Focus.load_session_state_button()
+Focus.save_session_state_button()
 Focus.pdf_block()
+
