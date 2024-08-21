@@ -21,7 +21,7 @@ def draw_distance(criterias_dict, focus, pixel_size, target_size):
         text='Дальность',
         color=alt.Color('color').scale(None),).properties(height=500)
 
-    st.altair_chart(chart.mark_bar() + chart.mark_text(align='left', dx=2,  fontSize=20), use_container_width=True)
+    st.altair_chart(chart.mark_bar() + chart.mark_text(align='left', dx=2,  fontSize=18), use_container_width=True)
 
 Focus.adjust_width_of_page()
 Focus.draw_side_bar(page_2=True)
