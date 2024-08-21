@@ -1,6 +1,27 @@
 import streamlit as st
 st.set_page_config("Оптический калькулятор")
 import Focus
+import altair as alt
+import pandas as pd
+
+def draw_distance(criterias_dict, focus, pixel_size, target_size):
+    distances = list()
+    colors = list()
+    criterias_list = list(criterias_dict)[:-3]
+    for criteria in criterias_list:
+        thr_pix_cnt_str = list(criterias[criteria])[0]
+        thr_pix_cnt = int(thr_pix_cnt_str)
+        distances.append(round(Focus.distance_calc(focus / 1000, thr_pix_cnt, pixel_size, target_size)))
+        colors.append(criterias[criteria][thr_pix_cnt_str])
+    data = pd.DataFrame({'Критерий': criterias_list, 'Дальность': distances, 'color': colors})
+
+    chart = alt.Chart(data).encode(
+        x='Дальность:Q',
+        y=alt.Y("Критерий", axis=alt.Axis(labelLimit=200)).sort('-x'),
+        text='Дальность',
+        color=alt.Color('color').scale(None),).properties(height=500)
+
+    st.altair_chart(chart.mark_bar() + chart.mark_text(align='left', dx=2,  fontSize=20), use_container_width=True)
 
 Focus.adjust_width_of_page()
 Focus.draw_side_bar(page_2=True)
@@ -42,11 +63,12 @@ with col_distance:
 Focus.resolving_power_block(col_resolving_power_lines, resolving_rad)
 Focus.degree_resolution_block(col_degree_resolving, degree_resolving)
 
-
-
 Focus.resolving_disclaimer()
 
 Focus.load_session_state_button()
 Focus.save_session_state_button(keys_to_save)
 Focus.pdf_block()
+
+draw_distance(criterias, focus, pixel_size, target_size)
+
 

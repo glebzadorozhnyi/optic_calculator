@@ -171,7 +171,7 @@ def criteria_block(criterias):
         if criteria == options[-1]:
             default_threshold_pixel_count = get_variable_from_session_state('threshold_pixel_count', 18)
         else:
-            default_threshold_pixel_count = float(criterias[criteria])
+            default_threshold_pixel_count = float(list(criterias[criteria])[0])
 
         st.session_state['threshold_pixel_count'] = default_threshold_pixel_count
 
