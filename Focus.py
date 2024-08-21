@@ -11,7 +11,6 @@ def adjust_width_of_page():
     </style>
     '''
     st.markdown(css, unsafe_allow_html=True)
-
 def draw_side_bar(page_1=False, page_2=False, page_3=False, page_4=False):
     with st.sidebar:
         icon = ':material/calculate:'
@@ -258,11 +257,8 @@ def degree_resolution_block(column, degree_resolution):
 
 def save_session_state_button():
     with st.sidebar:
-        data_to_save = dict()
-        for key, value in st.session_state.items():
-            if key == 'upload_file':
-                continue
-            data_to_save[key] = value
+        data_to_save = st.session_state.to_dict()
+        data_to_save.pop('upload_file', None)
         st.download_button('Экспорт расчёта', json.dumps(data_to_save), file_name='optic_calculator.json')
 
 def load_session_state_button():
