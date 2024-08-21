@@ -11,14 +11,6 @@ def adjust_width_of_page():
     </style>
     '''
     st.markdown(css, unsafe_allow_html=True)
-def draw_side_bar(page_1=False, page_2=False, page_3=False, page_4=False):
-    with st.sidebar:
-        icon = ':material/calculate:'
-        st.page_link('Focus.py', label='Фокус', icon=icon if page_1 else None)
-        st.page_link('pages/1_Distance.py', label='Дальность', icon=icon if page_2 else None)
-        st.page_link('pages/2_Pixels.py', label='Пиксели', icon=icon if page_3 else None)
-        st.page_link('pages/3_Target_size.py', label='Размер объекта', icon=icon if page_4 else None)
-
 
 @st.cache_data
 def read_json(filename):
@@ -76,7 +68,7 @@ def dd2dms(decimaldegree):
             return 0
     minutes = decimaldegree % 1.0 * 60
 
-    return '{0}°{1}\''.format(int(math.floor(decimaldegree)), int(math.floor(minutes)))
+    return '{0}°{1}\''.format(int(math.floor(decimaldegree)), int(round(minutes)))
 
 
 def get_variable_from_session_state(variable_name, default_value=None):
@@ -84,7 +76,13 @@ def get_variable_from_session_state(variable_name, default_value=None):
         return st.session_state[variable_name]
     else:
         return default_value
-
+def draw_side_bar(page_1=False, page_2=False, page_3=False, page_4=False):
+    with st.sidebar:
+        icon = ':material/calculate:'
+        st.page_link('Focus.py', label='Фокус', icon=icon if page_1 else None)
+        st.page_link('pages/1_Distance.py', label='Дальность', icon=icon if page_2 else None)
+        st.page_link('pages/2_Pixels.py', label='Пиксели', icon=icon if page_3 else None)
+        st.page_link('pages/3_Target_size.py', label='Размер объекта', icon=icon if page_4 else None)
 def head_and_matrix(data):
     st.image('shema.jpg', )
 
@@ -228,8 +226,9 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
             st.number_input('Угол обзора по горизонтали [°] (w)', min_value=0.01,
                                                max_value=359.0, step=1.0, key='field_h', help= "Ввод только в десятичном формате. Снизу отображение в формате [Градусы° Угловые минуты']")
 
-            st.session_state['field_v'] = st.session_state.field_h * pixel_vertical / pixel_horizontal
+
             st.session_state['focus'] = focus_calc_alt(st.session_state.field_h, pixel_horizontal, pixel_size) * 1000
+            st.session_state['field_v'] = field_calc(pixel_vertical, pixel_size, st.session_state['focus'] / 1000)
 
             st.number_input('Угол обзора по вертикали [°]', min_value=0.01,
                                                max_value=359.0, step=0.01, disabled=True, key='field_v')
@@ -255,9 +254,12 @@ def degree_resolution_block(column, degree_resolution):
 
 
 
-def save_session_state_button():
+def save_session_state_button(keys_to_save):
+    data_to_save = dict()
     with st.sidebar:
-        data_to_save = st.session_state.to_dict()
+        for key in keys_to_save:
+            if key in st.session_state:
+                data_to_save[key] = st.session_state[key]
         data_to_save.pop('upload_file', None)
         st.download_button('Экспорт расчёта', json.dumps(data_to_save), file_name='optic_calculator.json')
 
@@ -268,8 +270,6 @@ def load_session_state_button():
             try:
                 data = json.load(st.session_state['upload_file'])
                 for key, value in data.items():
-                    if key == 'upload_file':
-                        continue
                     st.session_state[key] = value
             except:
                 with st.sidebar:
@@ -296,6 +296,7 @@ if __name__ == "__main__":
     st.set_page_config("Оптический калькулятор")
     data = read_json('data.json')
     criterias = read_json('criteria.json')
+    keys_to_save = list(read_json('keys_to_save.json'))
     adjust_width_of_page()
     draw_side_bar(page_1=True)
 
@@ -351,8 +352,7 @@ if __name__ == "__main__":
     resolving_disclaimer()
 
     load_session_state_button()
-    save_session_state_button()
+    save_session_state_button(keys_to_save)
     pdf_block()
-
 
 

@@ -8,6 +8,7 @@ Focus.draw_side_bar(page_4=True)
 
 data = Focus.read_json('data.json')
 criterias = Focus.read_json('criteria.json')
+keys_to_save = list(Focus.read_json('keys_to_save.json'))
 
 st.title('Размер цели')
 
@@ -47,6 +48,6 @@ Focus.degree_resolution_block(col_degree_resolving, degree_resolving)
 Focus.resolving_disclaimer()
 
 Focus.load_session_state_button()
-Focus.save_session_state_button()
+Focus.save_session_state_button(keys_to_save)
 Focus.pdf_block()
 
