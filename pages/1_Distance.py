@@ -17,7 +17,7 @@ def draw_distance(criterias_dict, focus, pixel_size, target_size):
 
     chart = alt.Chart(data).encode(
         x='Дальность:Q',
-        y=alt.Y("Критерий", axis=alt.Axis(labelLimit=200)).sort('-x'),
+        y=alt.Y("Критерий", axis=alt.Axis(labelLimit=200, labelColor='#000000')).sort('-x'),
         text='Дальность',
         color=alt.Color('color').scale(None),).properties(height=500)
 
