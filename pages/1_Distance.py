@@ -15,13 +15,17 @@ def draw_distance(criterias_dict, focus, pixel_size, target_size):
         colors.append(criterias[criteria][thr_pix_cnt_str])
     data = pd.DataFrame({'Критерий': criterias_list, 'Дальность': distances, 'color': colors})
 
-    chart = alt.Chart(data).encode(
-        x='Дальность:Q',
-        y=alt.Y("Критерий", axis=alt.Axis(labelLimit=200, labelColor='#000000')).sort('-x'),
-        text='Дальность',
-        color=alt.Color('color').scale(None),).properties(height=500)
+    bars = alt.Chart(data).encode(
+        x=alt.X('Дальность:Q'),
+        y=alt.Y("Критерий", axis=alt.Axis(labelLimit=200, labelColor='#000000', labelFontSize=14)).sort('-x').stack('zero'),
+        color=alt.Color('color').scale(None),).mark_bar()
+    text = alt.Chart(data).mark_text(dx=-30, color='white', fontSize=16).encode(
+    x=alt.X('Дальность:Q'),
+    y=alt.Y("Критерий").sort('-x'),
+    text=alt.Text('Дальность', format='.0f')
+)
 
-    st.altair_chart(chart.mark_bar() + chart.mark_text(align='left', dx=2,  fontSize=18), use_container_width=True)
+    st.altair_chart((bars + text).properties(height=400), use_container_width=True)
 
 Focus.adjust_width_of_page()
 Focus.draw_side_bar(page_2=True)
