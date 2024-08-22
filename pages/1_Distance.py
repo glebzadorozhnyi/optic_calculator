@@ -16,9 +16,9 @@ def draw_distance(criterias_dict, focus, pixel_size, target_size):
     data = pd.DataFrame({'Критерий': criterias_list, 'Дальность': distances, 'color': colors})
 
     bars = alt.Chart(data).encode(
-        x=alt.X('Дальность:Q'),
+        x=alt.X('Дальность:Q').scale(type="log"),
         y=alt.Y("Критерий", axis=alt.Axis(labelLimit=200, labelColor='#000000', labelFontSize=14)).sort('-x').stack('zero'),
-        color=alt.Color('color').scale(None),).mark_bar()
+        color=alt.Color('color', legend=None, scale=None)).mark_bar()
     text = alt.Chart(data).mark_text(dx=-30, color='white', fontSize=16).encode(
     x=alt.X('Дальность:Q'),
     y=alt.Y("Критерий").sort('-x'),
