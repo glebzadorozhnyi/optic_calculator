@@ -200,7 +200,7 @@ def focus_or_field(pixel_horizontal, pixel_vertical, pixel_size):
     if focus_or_field_selection == 'Фокус':
 
         with col_focus:
-            default_focus = get_variable_from_session_state('focus', 100)
+            default_focus = get_variable_from_session_state('focus', 21.5625)
             st.session_state['focus'] = default_focus
 
             focus = st.number_input('Фокусное расстояние [мм] (f)', min_value=0.1,
