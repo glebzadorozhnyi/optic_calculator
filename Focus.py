@@ -72,10 +72,7 @@ def dd2dms(decimaldegree):
 
 
 def get_variable_from_session_state(variable_name, default_value=None):
-    if variable_name in st.session_state:
-        return st.session_state[variable_name]
-    else:
-        return default_value
+        return st.session_state.get(variable_name, default_value)
 def draw_side_bar(page_1=False, page_2=False, page_3=False, page_4=False):
     with st.sidebar:
         icon = ':material/calculate:'
